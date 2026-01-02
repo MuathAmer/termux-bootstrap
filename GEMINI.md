@@ -44,9 +44,10 @@
 </PROTOCOL:VERIFY>
 
 <PROTOCOL:WORKFLOW>
-*   **Objective:** Git Best Practices.
+*   **Objective:** Git & Documentation Best Practices.
 *   **Action:**
     1.  Use Conventional Commits (e.g., `Feat:`, `Fix:`, `Docs:`).
     2.  Commit frequently when a logical unit of work is done.
     3.  Push immediately after committing.
+    4.  **Documentation Sync:** NEVER leave `GEMINI.md` or `README.md` in a stale state. Update them immediately with every implementation change to ensure they reflect the current codebase.
 </PROTOCOL:WORKFLOW>
