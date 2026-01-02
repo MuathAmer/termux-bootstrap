@@ -296,6 +296,37 @@ function ask
         gemini "\$argv"
     end
 end
+
+# Updater Function
+function upgrade-all
+    echo -e "\\033[0;34m[-] Updating System Packages...\\033[0m"
+    pkg update -y && pkg upgrade -y
+
+    if command -q npm
+        echo -e "\\033[0;34m[-] Updating NPM Global Packages (Gemini, etc)...\\033[0m"
+        npm update -g
+    end
+
+    if command -q pip
+        echo -e "\\033[0;34m[-] Updating Python Tools (yt-dlp, spotdl)...\\033[0m"
+        # We assume these are installed; if not, pip will just skip or install them. 
+        # Safer to check existence or just run upgrade which is harmless.
+        pip install --upgrade yt-dlp spotdl 2>/dev/null
+    end
+
+    if test -d ~/termux-whisper
+        echo -e "\\033[0;34m[-] Updating Termux Whisper...\\033[0m"
+        # store current dir
+        set -l prev_dir (pwd)
+        cd ~/termux-whisper
+        git pull
+        # Re-run setup if needed? Usually git pull is enough for scripts, 
+        # but if it requires recompilation, termux-whisper's makefile handles it on run.
+        cd \$prev_dir
+    end
+
+    echo -e "\\033[0;32m[OK] Upgrade Complete!\\033[0m"
+end
 $BLOCK_END
 "
 
@@ -398,5 +429,6 @@ log_success "Setup Complete!"
 echo -e "  ${YELLOW}*${NC} Please ${GREEN}restart Termux${NC} to apply all changes."
 echo -e "  ${YELLOW}*${NC} New Media Aliases: ${BLUE}music${NC} (spotDL), ${BLUE}video${NC} (yt-dlp)."
 echo -e "  ${YELLOW}*${NC} AI Alias: ${BLUE}whisper${NC} (Speech-to-text)."
+echo -e "  ${YELLOW}*${NC} Maintenance: ${BLUE}upgrade-all${NC} (Updates System + All Tools)."
 echo -e "  ${YELLOW}*${NC} Use ${BLUE}copy/paste${NC} to sync with Android clipboard."
 echo "--------------------------------------------"
