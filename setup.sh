@@ -94,8 +94,8 @@ EOF
 
 install_gemini() {
     if ! command -v gemini &> /dev/null; then
-        log_info "Installing Google Gemini CLI..."
-        npm install -g @google/gemini-cli
+        log_info "Installing Google Gemini CLI (Termux Optimized)..."
+        npm install -g @mmmbuto/gemini-cli-termux
     else
         log_success "Gemini CLI is already installed."
     fi
