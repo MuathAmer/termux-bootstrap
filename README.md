@@ -1,4 +1,4 @@
-# Termux Bootstrap v2.1
+# Termux Bootstrap v2.2
 
 A modular, safe, and mobile-optimized bootstrap script for your Termux environment. Turn a fresh Termux install into a powerful development environment in minutes.
 
@@ -9,6 +9,11 @@ A modular, safe, and mobile-optimized bootstrap script for your Termux environme
 - **Git**: Distributed version control.
 - **Node.js**: JavaScript runtime (LTS).
 - **Gemini CLI**: Google's AI assistant directly in your terminal.
+
+### 📦 Community Extras (New!)
+- **Media Suite**: Installs `yt-dlp` (YouTube) and `spotDL` (Spotify) with **FFmpeg**.
+    - *Optimized:* Automatically configures downloads to save to `/sdcard/Download/Termux` and `/sdcard/Music`.
+- **Termux Whisper**: Installs [termux-whisper](https://github.com/MuathAmer/termux-whisper) for offline, privacy-focused AI speech transcription on your phone.
 
 ### 📱 Mobile Optimizations (Portrait Mode)
 - **Starship (Portrait Config)**: Optional 2-line prompt optimized for narrow phone screens.
@@ -58,35 +63,30 @@ Ideal for automated setups.
 ./setup.sh -y
 ```
 
-## Mobile Shortcuts & Helpers
+## Shortcuts & Aliases
 
-To make typing easier on touchscreens, the following shortcuts are included:
+To make mobile usage easier, the following shortcuts are included:
 
 | Alias | Command | Description |
 | :--- | :--- | :--- |
-| `c` | `clear` | Clear the terminal screen |
-| `..` / `...` | `cd ..` | Navigate up directories |
-| `g` | `git` | Git command |
-| `gl` | `git log --oneline...` | **Narrow** git log for phones |
-| `up` | `pkg update...` | Update and upgrade packages |
-| `in` | `pkg install` | Install a new package |
+| **`video`** | `yt-dlp ...` | Download video to `/sdcard/Download/Termux` |
+| **`music`** | `spotdl ...` | Download Spotify songs to `/sdcard/Music` |
+| **`whisper`** | `termux-whisper` | Launch the AI Transcriber |
 | `copy` | `termux-clipboard-set` | Pipe text to Android clipboard |
 | `paste` | `termux-clipboard-get` | Paste from Android clipboard |
+| `gl` | `git log --oneline...` | **Narrow** git log for phones |
+| `c` | `clear` | Clear screen |
+| `..` | `cd ..` | Go up one directory |
 
 > **Note:** For `copy`/`paste` to work, you must have the [Termux:API](https://f-droid.org/en/packages/com.termux.api/) app installed on your Android device.
 
 ## Post-Install Guide
 
-1.  **Restart Termux** to load the new font and shell settings.
-2.  **Configure Gemini**:
-    Run the following command (you need an API key from [Google AI Studio](https://aistudio.google.com/)):
-    ```bash
-    gemini configure
-    ```
-3.  **Try the new commands**:
-    *   `ask "How do I reverse a string in Python?"` (AI Assistance)
-    *   `z termux` (Smart jump to directories)
-    *   `micro README.md` (Edit with touch support)
+1.  **Restart Termux** to load the new settings.
+2.  **Configure Gemini**: `gemini configure` (Requires API Key).
+3.  **Try the Extras**:
+    *   `video "https://youtube.com/watch?v=..."`
+    *   `music "https://open.spotify.com/track/..."`
 
 ## Credits
 

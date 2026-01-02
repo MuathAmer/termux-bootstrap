@@ -1,8 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # ==============================================================================
-# Termux Bootstrap v2.1
-# A modular, safe, and modern setup script for Termux.
+# Termux Bootstrap v2.2
+# A modular, safe, and mobile-optimized setup script for Termux.
 # ==============================================================================
 
 # --- Variables ---
@@ -40,8 +40,8 @@ prompt_confirm() {
     while true; do
         read -r -p "$1 [Y/n]: " yn
         case $yn in
-            [Yy]* ) return 0;; 
-            [Nn]* ) return 1;; 
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
             "" ) return 0;; # Default to Yes
             * ) echo "Please answer yes or no.";;
         esac
@@ -97,6 +97,42 @@ install_gemini() {
         npm install -g @google/gemini-cli
     else
         log_success "Gemini CLI is already installed."
+    fi
+}
+
+install_media_suite() {
+    log_info "Installing Media Suite (Python, FFmpeg, yt-dlp, spotDL)..."
+    pkg install python ffmpeg -y
+    
+    log_info "Installing Python packages (yt-dlp, spotdl)..."
+    pip install yt-dlp spotdl
+    
+    log_info "Configuring storage paths for downloads..."
+    # Create Download folders in standard Android locations
+    mkdir -p "/sdcard/Download/Termux"
+    mkdir -p "/sdcard/Music/SpotDL"
+
+    # Configure yt-dlp
+    mkdir -p "$HOME/.config/yt-dlp"
+    # Config: Save to sdcard, cleaner filenames
+    echo '-o /sdcard/Download/Termux/%(title)s.%(ext)s' > "$HOME/.config/yt-dlp/config"
+    echo '--no-mtime' >> "$HOME/.config/yt-dlp/config"
+    
+    # spotDL doesn't have a simple config file for output dir, handled via alias
+    log_success "Media Suite installed. Downloads will go to your device storage."
+}
+
+install_termux_whisper() {
+    if [ -d "$HOME/termux-whisper" ]; then
+        log_warn "Termux Whisper directory already exists. Skipping clone."
+    else
+        log_info "Cloning Termux Whisper..."
+        git clone https://github.com/MuathAmer/termux-whisper.git "$HOME/termux-whisper"
+        
+        log_info "Running Termux Whisper setup..."
+        chmod +x "$HOME/termux-whisper/setup.sh"
+        # Run setup, handling potential interactive prompts if possible or warn user
+        bash "$HOME/termux-whisper/setup.sh"
     fi
 }
 
@@ -203,6 +239,20 @@ if command -q termux-clipboard-get
     alias paste='termux-clipboard-get'
 end
 
+# Media Suite Aliases
+if command -q yt-dlp
+    alias video='yt-dlp'
+end
+if command -q spotdl
+    # Force output to Music folder
+    alias music='spotdl --output /sdcard/Music/SpotDL'
+end
+
+# Termux Whisper Alias
+if test -f ~/termux-whisper/transcribe.sh
+    alias whisper='bash ~/termux-whisper/transcribe.sh'
+end
+
 # Editor
 if command -q micro
     set -gx EDITOR micro
@@ -235,15 +285,118 @@ end
 
 # Gemini 'Ask' Helper
 function ask
-    if test -z \"\$argv\"
-        echo \"Usage: ask 'your question'\"
+    if test -z "\$argv"
+        echo "Usage: ask 'your question'"
         return 1
     end
     # Check if glow is installed for rendering, else plain text
     if command -q glow
-        gemini \"\$argv\" | glow -
+        gemini "\$argv" | glow -
     else
-        gemini \"\$argv\"
+        gemini "\$argv"
     end
 end
 $BLOCK_END
+"
+
+    # Remove existing block if present
+    if [ -f "$CONFIG_FILE" ]; then
+        # Use sed to delete the block. 
+        # We backup first just in case sed goes wrong.
+        backup_file "$CONFIG_FILE"
+        sed -i "/$BLOCK_START/,/$BLOCK_END/d" "$CONFIG_FILE"
+        # Remove trailing newlines potentially left behind
+        sed -i '${/^$/d;}' "$CONFIG_FILE"
+    fi
+
+    # Append new block
+    echo "$NEW_CONFIG" >> "$CONFIG_FILE"
+    log_success "Fish configuration updated."
+}
+
+set_default_shell() {
+    local SHELL_PATH=$(which fish)
+    if [ "$SHELL" != "$SHELL_PATH" ]; then
+        log_info "Changing default shell to Fish..."
+        chsh -s fish
+    else
+        log_success "Fish is already the default shell."
+    fi
+}
+
+cleanup_motd() {
+    if [ -f "$PREFIX/etc/motd" ]; then
+        log_info "Removing Termux default MOTD..."
+        rm "$PREFIX/etc/motd"
+    fi
+}
+
+# --- Main Execution ---
+
+# Check arguments
+if [ "$1" == "-y" ]; then
+    INTERACTIVE=false
+fi
+
+clear
+echo -e "${GREEN}"
+echo "  _______                                   "
+echo " |__   __|                                  "
+echo "    | | ___ _ __ _ __ ___  _   ___  __      "
+echo "    | |/ _ \ '__| '_ \` _ \| | | \\/ /      "
+echo "    | |  __/ |  | | | | | | |_| |>  <       "
+echo "    |_|\___|_|  |_| |_| |_|\__,_/_/\_\      "
+echo "          B O O T S T R A P   v 2 . 2       "
+echo -e "${NC}"
+echo "--------------------------------------------"
+
+setup_storage
+
+if prompt_confirm "Update system packages?"; then
+    update_system
+fi
+
+if prompt_confirm "Install base tools (Git, Fish, Node)?"; then
+    install_base_tools
+fi
+
+if prompt_confirm "Install modern UI tools (Starship, Lsd, Bat, Zoxide)?"; then
+    install_modern_tools
+    # Nested prompt for Starship config dependent on Starship installation
+    if prompt_confirm "  -> Configure Starship for Portrait Mode (2-line prompt)?"; then
+        configure_starship_portrait
+    fi
+fi
+
+if prompt_confirm "Install Micro (Touch-friendly editor)?"; then
+    install_micro_editor
+fi
+
+if prompt_confirm "Install Gemini CLI?"; then
+    install_gemini
+fi
+
+# Community Extras Section
+if prompt_confirm "Install 'Media Suite' (YouTube & Spotify Downloaders)?"; then
+    install_media_suite
+fi
+
+if prompt_confirm "Install 'Termux Whisper' (Offline Speech-to-Text)?"; then
+    install_termux_whisper
+fi
+
+if prompt_confirm "Install Nerd Font (required for icons)?"; then
+    install_nerd_font
+fi
+
+configure_fish
+set_default_shell
+cleanup_motd
+
+echo "--------------------------------------------"
+log_success "Setup Complete!"
+echo -e "  ${YELLOW}*${NC} Please ${GREEN}restart Termux${NC} to apply all changes."
+echo -e "  ${YELLOW}*${NC} New Media Aliases: ${BLUE}music${NC} (spotDL), ${BLUE}video${NC} (yt-dlp)."
+echo -e "  ${YELLOW}*${NC} AI Alias: ${BLUE}whisper${NC} (Speech-to-text)."
+echo -e "  ${YELLOW}*${NC} Use ${BLUE}copy/paste${NC} to sync with Android clipboard."
+echo "--------------------------------------------"
