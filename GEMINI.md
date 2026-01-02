@@ -34,6 +34,7 @@
         *   The final success message.
         *   The `README.md` (Features list & Shortcuts table).
         *   The `uninstall.sh` script (for cleanup).
+    5.  **Silent Upgrades:** When running `pkg upgrade`, always use `-o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"` to prevent confusing prompts about config files during bootstrapping.
 </PROTOCOL:ACT>
 
 <PROTOCOL:VERIFY>

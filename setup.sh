@@ -60,7 +60,7 @@ backup_file() {
 
 update_system() {
     log_info "Updating package lists and upgrading system..."
-    pkg update -y && pkg upgrade -y
+    pkg update -y && pkg upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 }
 
 install_base_tools() {
@@ -300,7 +300,7 @@ end
 # Updater Function
 function upgrade-all
     echo -e \"\\\\033[0;34m[-] Updating System Packages...\\\\033[0m\"
-    pkg update -y && pkg upgrade -y
+    pkg update -y && pkg upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
     if command -q npm
         echo -e \"\\\\033[0;34m[-] Updating NPM Global Packages (Gemini, etc)...\\\\033[0m\"
