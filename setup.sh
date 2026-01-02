@@ -137,8 +137,14 @@ install_termux_whisper() {
 }
 
 setup_storage() {
-    log_info "Requesting Termux storage access..."
-    termux-setup-storage
+    log_info "Checking Termux storage access..."
+    if [ -d "$HOME/storage" ]; then
+        log_success "Termux storage is already configured."
+    else
+        echo -e "    ${YELLOW}->${NC} This links Termux to your Android 'Downloads' and 'Music' folders."
+        echo -e "    ${YELLOW}->${NC} Please grant permission in the popup if asked."
+        termux-setup-storage
+    fi
 }
 
 install_nerd_font() {
@@ -371,15 +377,10 @@ fi
 
 clear
 echo -e "${GREEN}"
-echo "  _______                                   "
-echo " |__   __|                                  "
-echo "    | | ___ _ __ _ __ ___  _   ___  __      "
-echo "    | |/ _ \ '__| '_ \` _ \| | | \\/ /      "
-echo "    | |  __/ |  | | | | | | |_| |>  <       "
-echo "    |_|\___|_|  |_| |_| |_|\__,_/_/\_\      "
-echo "          B O O T S T R A P   v 2 . 2       "
+echo "============================================"
+echo "       TERMUX BOOTSTRAP v2.2                "
+echo "============================================"
 echo -e "${NC}"
-echo "--------------------------------------------"
 
 setup_storage
 
