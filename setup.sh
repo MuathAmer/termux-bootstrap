@@ -1,13 +1,17 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # ==============================================================================
-# Termux Bootstrap v2.0
+# Termux Bootstrap v2.1
 # A modular, safe, and modern setup script for Termux.
 # ==============================================================================
 
 # --- Variables ---
 CONFIG_DIR="$HOME/.config/fish"
 CONFIG_FILE="$CONFIG_DIR/config.fish"
+STARSHIP_CONFIG_DIR="$HOME/.config"
+STARSHIP_CONFIG_FILE="$STARSHIP_CONFIG_DIR/starship.toml"
+MICRO_CONFIG_DIR="$HOME/.config/micro"
+MICRO_CONFIG_FILE="$MICRO_CONFIG_DIR/settings.json"
 FONT_DIR="$HOME/.termux"
 FONT_FILE="$FONT_DIR/font.ttf"
 BACKUP_SUFFIX=".bak.$(date +%Y%m%d_%H%M%S)"
@@ -33,7 +37,7 @@ prompt_confirm() {
         return 0
     fi
     
-    while true;
+    while true; do
         read -r -p "$1 [Y/n]: " yn
         case $yn in
             [Yy]* ) return 0;; 
@@ -60,13 +64,31 @@ update_system() {
 }
 
 install_base_tools() {
-    log_info "Installing base tools (Git, Fish, Node.js, Curl)..."
+    log_info "Installing base tools (Git, Fish, Node.js, Curl, Termux API)..."
     pkg install git fish nodejs-lts curl termux-api -y
 }
 
 install_modern_tools() {
     log_info "Installing modern CLI tools (Lsd, Bat, Zoxide, Fzf, Starship, Glow)..."
     pkg install lsd bat zoxide fzf starship glow -y
+}
+
+install_micro_editor() {
+    log_info "Installing Micro editor..."
+    pkg install micro -y
+    
+    # Configure Micro for touch and softwrap
+    mkdir -p "$MICRO_CONFIG_DIR"
+    if [ ! -f "$MICRO_CONFIG_FILE" ]; then
+        log_info "Configuring Micro (softwrap, mouse support)..."
+        cat <<EOF > "$MICRO_CONFIG_FILE"
+{
+    "softwrap": true,
+    "mouse": true,
+    "autosu": true
+}
+EOF
+    fi
 }
 
 install_gemini() {
@@ -101,18 +123,48 @@ install_nerd_font() {
     termux-reload-settings
 }
 
+configure_starship_portrait() {
+    log_info "Configuring Starship for Portrait Mode (2-line prompt)..."
+    mkdir -p "$STARSHIP_CONFIG_DIR"
+    backup_file "$STARSHIP_CONFIG_FILE"
+    
+    cat <<EOF > "$STARSHIP_CONFIG_FILE"
+# Portrait Mode Optimized Config
+# Two lines: Information on top, input on bottom.
+
+add_newline = true
+
+[line_break]
+disabled = false
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold green)"
+
+[directory]
+truncation_length = 3
+truncation_symbol = "…/"
+style = "bold cyan"
+
+[git_branch]
+symbol = "🌱 "
+style = "bold purple"
+
+[nodejs]
+symbol = "⬢ "
+style = "bold green"
+
+[package]
+symbol = "📦 "
+disabled = true
+EOF
+}
+
 configure_fish() {
     log_info "Configuring Fish Shell..."
     mkdir -p "$CONFIG_DIR"
     
-    # Backup existing config if it's not our own generated one (optional safety)
-    if [ -f "$CONFIG_FILE" ]; then
-         # Only backup if we haven't backed it up in this session ideally, 
-         # but simpler to just backup existing user file once if needed.
-         # For this script, we use block replacement so we are non-destructive to outside content.
-         :
-    fi
-
     # Define the block content
     local BLOCK_START="# --- TERMUX-BOOTSTRAP-START ---"
     local BLOCK_END="# --- TERMUX-BOOTSTRAP-END ---"
@@ -141,6 +193,7 @@ alias c='clear'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias g='git'
+alias gl='git log --oneline --graph --decorate' # Narrow git log
 alias up='pkg update && pkg upgrade'
 alias in='pkg install'
 
@@ -148,6 +201,12 @@ alias in='pkg install'
 if command -q termux-clipboard-get
     alias copy='termux-clipboard-set'
     alias paste='termux-clipboard-get'
+end
+
+# Editor
+if command -q micro
+    set -gx EDITOR micro
+    alias nano='micro'
 end
 
 # Starship Prompt
@@ -177,106 +236,14 @@ end
 # Gemini 'Ask' Helper
 function ask
     if test -z \"\$argv\"
-        echo "Usage: ask 'your question'"
+        echo \"Usage: ask 'your question'\"
         return 1
     end
     # Check if glow is installed for rendering, else plain text
     if command -q glow
-        gemini "\$argv" | glow -
+        gemini \"\$argv\" | glow -
     else
-        gemini "\$argv"
+        gemini \"\$argv\"
     end
 end
 $BLOCK_END
-"
-
-    # Remove existing block if present
-    if [ -f "$CONFIG_FILE" ]; then
-         # Use sed to delete the block. 
-         # We backup first just in case sed goes wrong.
-         backup_file "$CONFIG_FILE"
-         sed -i "/$BLOCK_START/,/$BLOCK_END/d" "$CONFIG_FILE"
-         # Remove trailing newlines potentially left behind
-         sed -i '${/^$/d;}' "$CONFIG_FILE"
-    fi
-
-    # Append new block
-    echo "$NEW_CONFIG" >> "$CONFIG_FILE"
-    log_success "Fish configuration updated."
-}
-
-set_default_shell() {
-    local SHELL_PATH=$(which fish)
-    if [ "$SHELL" != "$SHELL_PATH" ]; then
-        log_info "Changing default shell to Fish..."
-        chsh -s fish
-    else
-        log_success "Fish is already the default shell."
-    fi
-}
-
-cleanup_motd() {
-    if [ -f "$PREFIX/etc/motd" ]; then
-        log_info "Removing Termux default MOTD..."
-        rm "$PREFIX/etc/motd"
-    fi
-}
-
-# --- Main Execution ---
-
-# Check arguments
-if [ "$1" == "-y" ]; then
-    INTERACTIVE=false
-fi
-
-clear
-echo -e "${GREEN}"
-echo "  _______                                   "
-echo " |__   __|                                  "
-echo "    | | ___ _ __ _ __ ___  _   ___  __      "
-echo "    | |/ _ \ '__| '_ \` _ \| | | \ \/ /      "
-echo "    | |  __/ |  | | | | | | |_| |>  <       "
-echo "    |_|\___|_|  |_| |_| |_|\__,_/_/\_\      "
-echo "          B O O T S T R A P   v 2 . 0       "
-echo -e "${NC}"
-echo "--------------------------------------------"
-
-setup_storage
-
-if prompt_confirm "Update system packages?"
-    update_system
-fi
-
-if prompt_confirm "Install base tools (Git, Fish, Node)?"
-    install_base_tools
-fi
-
-if prompt_confirm "Install modern UI tools (Starship, Lsd, Bat, Zoxide)?"
-    install_modern_tools
-fi
-
-if prompt_confirm "Install Gemini CLI?"
-    install_gemini
-fi
-
-if prompt_confirm "Install Nerd Font (required for icons)?"
-    install_nerd_font
-fi
-
-configure_fish
-set_default_shell
-cleanup_motd
-
-echo "--------------------------------------------"
-
-log_success "Setup Complete!"
-
-echo -e "  ${YELLOW}*${NC} Please ${GREEN}restart Termux${NC} to apply all changes."
-
-echo -e "  ${YELLOW}*${NC} Try typing ${BLUE}ask 'Hello'${NC} to test Gemini."
-
-echo -e "  ${YELLOW}*${NC} Use ${BLUE}copy/paste${NC} to sync with Android clipboard."
-
-echo -e "  ${YELLOW}*${NC} Short aliases: ${BLUE}c${NC} (clear), ${BLUE}g${NC} (git), ${BLUE}up${NC} (update)."
-
-echo "--------------------------------------------"

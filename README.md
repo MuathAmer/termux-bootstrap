@@ -1,6 +1,6 @@
-# Termux Bootstrap v2.0
+# Termux Bootstrap v2.1
 
-A modular, safe, and modern bootstrap script for your Termux environment. Turn a fresh Termux install into a powerful development environment in minutes.
+A modular, safe, and mobile-optimized bootstrap script for your Termux environment. Turn a fresh Termux install into a powerful development environment in minutes.
 
 ## Features
 
@@ -10,8 +10,13 @@ A modular, safe, and modern bootstrap script for your Termux environment. Turn a
 - **Node.js**: JavaScript runtime (LTS).
 - **Gemini CLI**: Google's AI assistant directly in your terminal.
 
+### 📱 Mobile Optimizations (Portrait Mode)
+- **Starship (Portrait Config)**: Optional 2-line prompt optimized for narrow phone screens.
+- **Micro Editor**: Touch-friendly text editor with mouse/touch support enabled by default.
+- **Narrow Aliases**: Shortcuts like `gl` (git log graph) designed to fit on phone screens.
+- **Clipboard Sync**: `copy` and `paste` commands to sync with Android clipboard.
+
 ### 🎨 Modern UI ("The Ricing")
-- **Starship**: Fast, customizable, and beautiful cross-shell prompt.
 - **Lsd**: The next gen `ls` command with colors and icons.
 - **Bat**: A `cat` clone with syntax highlighting and Git integration.
 - **Zoxide**: A smarter `cd` command that remembers your frequent directories.
@@ -53,6 +58,23 @@ Ideal for automated setups.
 ./setup.sh -y
 ```
 
+## Mobile Shortcuts & Helpers
+
+To make typing easier on touchscreens, the following shortcuts are included:
+
+| Alias | Command | Description |
+| :--- | :--- | :--- |
+| `c` | `clear` | Clear the terminal screen |
+| `..` / `...` | `cd ..` | Navigate up directories |
+| `g` | `git` | Git command |
+| `gl` | `git log --oneline...` | **Narrow** git log for phones |
+| `up` | `pkg update...` | Update and upgrade packages |
+| `in` | `pkg install` | Install a new package |
+| `copy` | `termux-clipboard-set` | Pipe text to Android clipboard |
+| `paste` | `termux-clipboard-get` | Paste from Android clipboard |
+
+> **Note:** For `copy`/`paste` to work, you must have the [Termux:API](https://f-droid.org/en/packages/com.termux.api/) app installed on your Android device.
+
 ## Post-Install Guide
 
 1.  **Restart Termux** to load the new font and shell settings.
@@ -64,24 +86,7 @@ Ideal for automated setups.
 3.  **Try the new commands**:
     *   `ask "How do I reverse a string in Python?"` (AI Assistance)
     *   `z termux` (Smart jump to directories)
-    *   `ls` (See the new icons)
-    *   `cat README.md` (See syntax highlighting)
-
-## Mobile Shortcuts & Helpers
-
-To make typing easier on touchscreens, the following shortcuts are included:
-
-| Alias | Command | Description |
-| :--- | :--- | :--- |
-| `c` | `clear` | Clear the terminal screen |
-| `..` / `...` | `cd ..` | Navigate up directories |
-| `g` | `git` | Git command |
-| `up` | `pkg update...` | Update and upgrade packages |
-| `in` | `pkg install` | Install a new package |
-| `copy` | `termux-clipboard-set` | Pipe text to Android clipboard |
-| `paste` | `termux-clipboard-get` | Paste from Android clipboard |
-
-> **Note:** For `copy`/`paste` to work, you must have the [Termux:API](https://f-droid.org/en/packages/com.termux.api/) app installed on your Android device.
+    *   `micro README.md` (Edit with touch support)
 
 ## Credits
 
