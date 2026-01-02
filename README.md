@@ -110,3 +110,4 @@ To make mobile usage easier, the following shortcuts are included:
 
 - Inspired by [termux-fish](https://github.com/msn-05/termux-fish).
 - Uses [Starship](https://starship.rs) and [Nerd Fonts](https://www.nerdfonts.com).
+- Optimized Gemini CLI provided by [@mmmbuto/gemini-cli-termux](https://www.npmjs.com/package/@mmmbuto/gemini-cli-termux).
