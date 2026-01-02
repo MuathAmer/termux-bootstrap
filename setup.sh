@@ -436,10 +436,19 @@ cleanup_motd() {
 
 # --- Main Execution ---
 
+# Ensure device stays awake during setup
+cleanup() {
+    termux-wake-unlock
+}
+trap cleanup EXIT INT TERM
+
 # Check arguments
 if [ "$1" == "-y" ]; then
     INTERACTIVE=false
 fi
+
+termux-wake-lock
+log_info "Wake lock acquired. Device will stay awake during setup."
 
 clear
 echo -e "${GREEN}"
