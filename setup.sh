@@ -22,14 +22,22 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # --- Helper Functions ---
 
-log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
-log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+log_header() { 
+    echo -e "\n${PURPLE}============================================================${NC}"
+    echo -e "${PURPLE}:: ${CYAN}$1${NC}"
+    echo -e "${PURPLE}============================================================${NC}"
+}
+
+log_info() { echo -e "${BLUE}  [INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}  [OK]${NC}   $1"; }
+log_warn() { echo -e "${YELLOW}  [WARN]${NC} $1"; }
+log_error() { echo -e "${RED}  [ERR]${NC}  $1"; }
 
 prompt_confirm() {
     # If not interactive, return 0 (true/yes)
@@ -37,8 +45,9 @@ prompt_confirm() {
         return 0
     fi
     
+    echo ""
     while true; do
-        read -r -p "$1 [Y/n]: " yn
+        read -r -p "$(echo -e "${CYAN}? $1 [Y/n]: ${NC}")" yn
         case $yn in
             [Yy]* ) return 0;;
             [Nn]* ) return 1;;
@@ -59,23 +68,29 @@ backup_file() {
 # --- Installation Functions ---
 
 update_system() {
+    log_header "System Update"
     log_info "Updating package lists and upgrading system..."
     pkg update -y && pkg upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 }
 
 install_base_tools() {
-    log_info "Installing base tools (Git, Fish, Node.js, Curl, Termux API)..."
+    log_header "Base Tools Installation"
+    log_info "Installing core packages..."
     # Added build-essential and python for node-gyp native compilations
     pkg install git fish nodejs-lts curl termux-api build-essential python -y
+    log_success "Base tools installed."
 }
 
 install_modern_tools() {
-    log_info "Installing modern CLI tools (Lsd, Bat, Zoxide, Fzf, Starship, Glow)..."
+    log_header "Modern UI Tools"
+    log_info "Installing improved CLI utilities..."
     pkg install lsd bat zoxide fzf starship glow -y
+    log_success "Modern tools installed."
 }
 
 install_micro_editor() {
-    log_info "Installing Micro editor..."
+    log_header "Micro Editor Setup"
+    log_info "Installing Micro..."
     pkg install micro -y
     
     # Configure Micro for touch and softwrap
@@ -89,27 +104,33 @@ install_micro_editor() {
     "autosu": true
 }
 EOF
+        log_success "Micro configuration created."
+    else
+        log_info "Micro configuration already exists."
     fi
 }
 
 install_gemini() {
+    log_header "Gemini CLI Setup"
     if ! command -v gemini &> /dev/null; then
         log_info "Installing Google Gemini CLI (Termux Optimized)..."
         npm install -g @mmmbuto/gemini-cli-termux
+        log_success "Gemini CLI installed successfully."
     else
         log_success "Gemini CLI is already installed."
     fi
 }
 
 install_media_suite() {
-    log_info "Installing Media Suite (Python, FFmpeg, yt-dlp, spotDL)..."
+    log_header "Media Suite Installation"
+    log_info "Installing dependencies (Python, FFmpeg, Rust)..."
     # Added rust and binutils for building pydantic-core (spotdl dependency)
     pkg install python ffmpeg rust binutils -y
     
     log_info "Installing Python packages (yt-dlp, spotdl)..."
     pip install yt-dlp spotdl
     
-    log_info "Configuring storage paths for downloads..."
+    log_info "Configuring storage paths..."
     # Create Download folders in standard Android locations
     mkdir -p "/sdcard/Download/Termux"
     mkdir -p "/sdcard/Music/SpotDL"
@@ -120,11 +141,11 @@ install_media_suite() {
     echo '-o /sdcard/Download/Termux/%(title)s.%(ext)s' > "$HOME/.config/yt-dlp/config"
     echo '--no-mtime' >> "$HOME/.config/yt-dlp/config"
     
-    # spotDL doesn't have a simple config file for output dir, handled via alias
-    log_success "Media Suite installed. Downloads will go to your device storage."
+    log_success "Media Suite installed & configured."
 }
 
 install_termux_whisper() {
+    log_header "Termux Whisper Setup"
     if [ -d "$HOME/termux-whisper" ]; then
         log_warn "Termux Whisper directory already exists. Skipping clone."
     else
@@ -139,6 +160,7 @@ install_termux_whisper() {
 }
 
 setup_storage() {
+    log_header "Storage Access"
     log_info "Checking Termux storage access..."
     if [ -d "$HOME/storage" ]; then
         log_success "Termux storage is already configured."
@@ -150,6 +172,7 @@ setup_storage() {
 }
 
 install_nerd_font() {
+    log_header "Nerd Font Installation"
     if [ -f "$FONT_FILE" ]; then
         log_warn "A font is already installed at $FONT_FILE."
         if ! prompt_confirm "Do you want to overwrite it with JetBrains Mono Nerd Font?"; then
@@ -174,6 +197,7 @@ install_nerd_font() {
              log_info "Font downloaded successfully ($((FONT_SIZE/1024)) KB)."
              log_info "Reloading Termux settings to apply font..."
              termux-reload-settings
+             log_success "Font applied."
              return
         fi
     fi
@@ -218,9 +242,11 @@ style = "bold green"
 symbol = "📦 "
 disabled = true
 EOF
+    log_success "Starship configured for portrait mode."
 }
 
 configure_fish() {
+    log_header "Shell Configuration"
     log_info "Configuring Fish Shell..."
     mkdir -p "$CONFIG_DIR"
     
