@@ -299,23 +299,23 @@ end
 
 # Updater Function
 function upgrade-all
-    echo -e "\\033[0;34m[-] Updating System Packages...\\033[0m"
+    echo -e \"\\\\033[0;34m[-] Updating System Packages...\\\\033[0m\"
     pkg update -y && pkg upgrade -y
 
     if command -q npm
-        echo -e "\\033[0;34m[-] Updating NPM Global Packages (Gemini, etc)...\\033[0m"
+        echo -e \"\\\\033[0;34m[-] Updating NPM Global Packages (Gemini, etc)...\\\\033[0m\"
         npm update -g
     end
 
     if command -q pip
-        echo -e "\\033[0;34m[-] Updating Python Tools (yt-dlp, spotdl)...\\033[0m"
+        echo -e \"\\\\033[0;34m[-] Updating Python Tools (yt-dlp, spotdl)...\\\\033[0m\"
         # We assume these are installed; if not, pip will just skip or install them. 
         # Safer to check existence or just run upgrade which is harmless.
         pip install --upgrade yt-dlp spotdl 2>/dev/null
     end
 
     if test -d ~/termux-whisper
-        echo -e "\\033[0;34m[-] Updating Termux Whisper...\\033[0m"
+        echo -e \"\\\\033[0;34m[-] Updating Termux Whisper...\\\\033[0m\"
         # store current dir
         set -l prev_dir (pwd)
         cd ~/termux-whisper
@@ -325,7 +325,7 @@ function upgrade-all
         cd \$prev_dir
     end
 
-    echo -e "\\033[0;32m[OK] Upgrade Complete!\\033[0m"
+    echo -e \"\\\\033[0;32m[OK] Upgrade Complete!\\\\033[0m\"
 end
 $BLOCK_END
 "
