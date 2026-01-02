@@ -20,14 +20,22 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # --- Helper Functions ---
 
-log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
-log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+log_header() { 
+    echo -e "\n${PURPLE}============================================================${NC}"
+    echo -e "${PURPLE}:: ${CYAN}$1${NC}"
+    echo -e "${PURPLE}============================================================${NC}"
+}
+
+log_info() { echo -e "${BLUE}  [INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}  [OK]${NC}   $1"; }
+log_warn() { echo -e "${YELLOW}  [WARN]${NC} $1"; }
+log_error() { echo -e "${RED}  [ERR]${NC}  $1"; }
 
 prompt_confirm() {
     local default_ans="$2" # "Y" or "N"
@@ -40,8 +48,9 @@ prompt_confirm() {
         default_ans="Y"
     fi
 
+    echo ""
     while true; do
-        read -r -p "$1 $prompt_suffix: " yn
+        read -r -p "$(echo -e "${CYAN}? $1 $prompt_suffix: ${NC}")" yn
         case $yn in
             [Yy]* ) return 0;;
             [Nn]* ) return 1;;
@@ -62,6 +71,7 @@ find_latest_backup() {
 # --- Steps ---
 
 revert_fish_config() {
+    log_header "Revert Fish Config"
     local BLOCK_START="# --- TERMUX-BOOTSTRAP-START ---"
     local BLOCK_END="# --- TERMUX-BOOTSTRAP-END ---"
 
@@ -110,6 +120,7 @@ restore_or_delete_file() {
 
 revert_font() {
     if [ -f "$FONT_FILE" ]; then
+        log_header "Revert Font"
         log_info "Checking Font configuration..."
         restore_or_delete_file "$FONT_FILE" "Termux Font"
         termux-reload-settings
@@ -117,6 +128,7 @@ revert_font() {
 }
 
 clean_configs() {
+    log_header "Clean Configurations"
     log_info "Checking configuration files..."
     restore_or_delete_file "$STARSHIP_CONFIG_FILE" "Starship Config"
     restore_or_delete_file "$MICRO_CONFIG_FILE" "Micro Editor Config"
@@ -124,12 +136,14 @@ clean_configs() {
 }
 
 uninstall_extras() {
+    log_header "Uninstall Extras"
     log_info "Checking installed extras..."
 
     # Gemini
     if command -v gemini &> /dev/null; then
         if prompt_confirm "Uninstall Gemini CLI?"; then
-            npm uninstall -g @google/gemini-cli
+            # Attempt to uninstall the optimized package, fall back to google just in case
+            npm uninstall -g @mmmbuto/gemini-cli-termux || npm uninstall -g @google/gemini-cli
             log_success "Gemini CLI removed."
         fi
     fi
@@ -152,6 +166,7 @@ uninstall_extras() {
 }
 
 revert_shell() {
+    log_header "Revert Shell"
     local BASH_PATH=$(which bash)
     if [ "$SHELL" != "$BASH_PATH" ]; then
         if prompt_confirm "Set default shell back to Bash?"; then
@@ -162,10 +177,10 @@ revert_shell() {
 }
 
 uninstall_packages() {
-    echo "------------------------------------------------------------------"
-    echo -e "${YELLOW}PACKAGE REMOVAL SECTION${NC}"
+    echo -e "\n${YELLOW}============================================================${NC}"
+    echo -e "${YELLOW}:: PACKAGE REMOVAL SECTION${NC}"
+    echo -e "${YELLOW}============================================================${NC}"
     echo "This step uninstalls packages. Be careful if you used Termux before this script."
-    echo "------------------------------------------------------------------"
 
     # Visual Tools (Low Risk)
     if prompt_confirm "Uninstall Visual Tools (starship, lsd, bat, zoxide, fzf, glow, micro)?"; then
@@ -204,6 +219,6 @@ uninstall_extras
 revert_shell
 uninstall_packages
 
-echo "------------------------------------------------------------------"
+echo -e "\n${GREEN}------------------------------------------------------------------${NC}"
 log_success "Uninstallation steps complete."
 echo -e "${YELLOW}*${NC} Please restart Termux for all changes to take effect."

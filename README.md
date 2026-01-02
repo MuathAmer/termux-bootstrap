@@ -8,7 +8,7 @@ A modular, safe, and mobile-optimized bootstrap script for your Termux environme
 - **Fish Shell**: Friendly interactive shell with auto-completions.
 - **Git**: Distributed version control.
 - **Node.js**: JavaScript runtime (LTS).
-- **Gemini CLI**: Google's AI assistant directly in your terminal.
+- **Gemini CLI**: Google's AI assistant directly in your terminal (Termux Optimized).
 
 ### 📦 Community Extras (New!)
 - **Media Suite**: Installs `yt-dlp` (YouTube) and `spotDL` (Spotify) with **FFmpeg**.
