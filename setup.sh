@@ -136,6 +136,20 @@ if command -q bat
     alias cat='bat'
 end
 
+# Mobile-Friendly Shortcuts
+alias c='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias g='git'
+alias up='pkg update && pkg upgrade'
+alias in='pkg install'
+
+# Clipboard Integration (Requires Termux:API app)
+if command -q termux-clipboard-get
+    alias copy='termux-clipboard-set'
+    alias paste='termux-clipboard-get'
+end
+
 # Starship Prompt
 if command -q starship
     starship init fish | source
@@ -254,8 +268,15 @@ set_default_shell
 cleanup_motd
 
 echo "--------------------------------------------"
+
 log_success "Setup Complete!"
+
 echo -e "  ${YELLOW}*${NC} Please ${GREEN}restart Termux${NC} to apply all changes."
+
 echo -e "  ${YELLOW}*${NC} Try typing ${BLUE}ask 'Hello'${NC} to test Gemini."
-echo -e "  ${YELLOW}*${NC} Use ${BLUE}z directory${NC} to jump around quickly."
+
+echo -e "  ${YELLOW}*${NC} Use ${BLUE}copy/paste${NC} to sync with Android clipboard."
+
+echo -e "  ${YELLOW}*${NC} Short aliases: ${BLUE}c${NC} (clear), ${BLUE}g${NC} (git), ${BLUE}up${NC} (update)."
+
 echo "--------------------------------------------"

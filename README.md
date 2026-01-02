@@ -67,6 +67,22 @@ Ideal for automated setups.
     *   `ls` (See the new icons)
     *   `cat README.md` (See syntax highlighting)
 
+## Mobile Shortcuts & Helpers
+
+To make typing easier on touchscreens, the following shortcuts are included:
+
+| Alias | Command | Description |
+| :--- | :--- | :--- |
+| `c` | `clear` | Clear the terminal screen |
+| `..` / `...` | `cd ..` | Navigate up directories |
+| `g` | `git` | Git command |
+| `up` | `pkg update...` | Update and upgrade packages |
+| `in` | `pkg install` | Install a new package |
+| `copy` | `termux-clipboard-set` | Pipe text to Android clipboard |
+| `paste` | `termux-clipboard-get` | Paste from Android clipboard |
+
+> **Note:** For `copy`/`paste` to work, you must have the [Termux:API](https://f-droid.org/en/packages/com.termux.api/) app installed on your Android device.
+
 ## Credits
 
 - Inspired by [termux-fish](https://github.com/msn-05/termux-fish).
