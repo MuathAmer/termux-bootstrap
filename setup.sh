@@ -409,6 +409,14 @@ function upgrade-all
         cd \$prev_dir
     end
 
+    if test -d ~/termux-bootstrap/.git
+        echo -e "\\033[0;34m[-] Updating Termux Bootstrap...\\033[0m"
+        set -l prev_dir (pwd)
+        cd ~/termux-bootstrap
+        git pull
+        cd \$prev_dir
+    end
+
     echo -e "\\033[0;32m[OK] Upgrade Complete!\\033[0m"
 end
 $BLOCK_END
