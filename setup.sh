@@ -399,6 +399,37 @@ function __fish_command_not_found_handler --on-event fish_command_not_found
     end
 end
 
+# Help / Cheat Sheet
+function shortcuts
+    echo -e "\n\033[1;35m============================================\033[0m"
+    echo -e "\033[1;35m       TERMUX BOOTSTRAP SHORTCUTS           \033[0m"
+    echo -e "\033[1;35m============================================\033[0m"
+    
+    echo -e "\033[1;32m[Media]\033[0m"
+    echo -e "  \033[0;36mvideo\033[0m   : Download video to /sdcard/Download"
+    echo -e "  \033[0;36mmusic\033[0m   : Smart Spotify download (+Lyrics/LRC)"
+    
+    echo -e "\n\033[1;32m[AI]\033[0m"
+    echo -e "  \033[0;36mwhisper\033[0m : AI Speech-to-Text (Offline)"
+    echo -e "  \033[0;36mask\033[0m     : Ask Gemini AI (e.g. ask 'hello')"
+    
+    echo -e "\n\033[1;32m[Git]\033[0m"
+    echo -e "  \033[0;36mg\033[0m       : git shortcut"
+    echo -e "  \033[0;36mgl\033[0m      : Pretty, narrow git log for mobile"
+    
+    echo -e "\n\033[1;32m[System]\033[0m"
+    echo -e "  \033[0;36mup\033[0m      : pkg update && upgrade"
+    echo -e "  \033[0;36min\033[0m      : pkg install"
+    echo -e "  \033[0;36mcopy\033[0m    : Pipe to Android clipboard"
+    echo -e "  \033[0;36mpaste\033[0m   : Paste from Android clipboard"
+    echo -e "  \033[0;36mc\033[0m       : Clear screen"
+    
+    echo -e "\n\033[1;32m[Maintenance]\033[0m"
+    echo -e "  \033[0;36mupgrade-all\033[0m : Update System + NPM + Pip + Repos"
+    
+    echo -e "\n\033[0;33mTip: Type 'shortcuts' anytime to see this list.\033[0m\n"
+end
+
 # Gemini 'Ask' Helper
 function ask
     if test -z "\$argv"

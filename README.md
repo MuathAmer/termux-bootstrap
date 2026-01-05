@@ -82,10 +82,11 @@ This script will:
 
 ## Shortcuts & Aliases
 
-To make mobile usage easier, the following shortcuts are included:
+To make mobile usage easier, the following shortcuts are included. Type **`shortcuts`** in your terminal to see this list anytime.
 
 | Alias | Command | Description |
 | :--- | :--- | :--- |
+| **`shortcuts`** | *(Function)* | **Display this help guide** |
 | **`video`** | `yt-dlp ...` | Download video to `/sdcard/Download/Termux` |
 | **`music`** | `spotdl ...` | Smart download (Lyrics, LRC, Metadata) |
 | **`whisper`** | `termux-whisper` | Launch the AI Transcriber |
