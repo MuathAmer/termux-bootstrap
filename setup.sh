@@ -547,30 +547,32 @@ function ask
     # Enable Google Account Auth for this session
     set -lx GOOGLE_GENAI_USE_GCA true
     
-    set -l gemini_args
-    
-    # Automagic Argument Handling
-    if not isatty stdin
-        # Data is being piped (e.g. cat file | ask "Summarize")
-        if test -n "$argv"
-            set gemini_args -p "$argv"
-        else
-            set gemini_args "$argv"
-        end
-    else
-        # No pipe, interactive usage
+    if isatty stdin
+        # Interactive Usage
         if test -z "$argv"
             echo "Usage: ask 'question' OR echo 'text' | ask 'instruction'"
             return 1
         end
-        set gemini_args "$argv"
-    end
-
-    # Execute with Glow rendering if available
-    if command -q glow
-        gemini $gemini_args | glow -
+        
+        if command -q glow
+            gemini $argv | glow -
+        else
+            gemini $argv
+        end
     else
-        gemini $gemini_args
+        # Piped Usage
+        set -l prompt (string join " " $argv)
+        set -l gemini_cmd gemini
+        
+        if test -n "$prompt"
+            set gemini_cmd gemini -p "$prompt"
+        end
+        
+        if command -q glow
+            $gemini_cmd | glow -
+        else
+            $gemini_cmd
+        end
     end
 end
 
