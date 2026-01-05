@@ -108,7 +108,10 @@ To make mobile usage easier, the following shortcuts are included. Type **`tb`**
 ## Post-Install Guide
 
 1.  **Restart Termux** to load the new settings.
-2.  **Configure Gemini**: `gemini configure` (Requires API Key).
+2.  **Configure Gemini**:
+    - Get a free API Key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+    - Run `gemini configure` and paste your key.
+    - Test it: `ask "Hello"`
 3.  **Try the Extras**:
     *   `video "https://youtube.com/watch?v=..."`
     *   `music "https://open.spotify.com/track/..."`

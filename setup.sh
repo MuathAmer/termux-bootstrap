@@ -517,7 +517,7 @@ function tb
     
     echo -e "\n\033[1;32m[AI]\033[0m"
     echo -e "  \033[0;36mwhisper\033[0m : AI Speech-to-Text (Offline)"
-    echo -e "  \033[0;36mask\033[0m     : Ask Gemini AI (e.g. ask 'hello')"
+    echo -e "  \033[0;36mask\033[0m     : Ask Gemini AI (Requires 'gemini configure')"
     
     echo -e "\n\033[1;32m[Git]\033[0m"
     echo -e "  \033[0;36mg\033[0m       : git shortcut"
