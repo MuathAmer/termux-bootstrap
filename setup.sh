@@ -95,7 +95,7 @@ show_menu() {
     local options=("Base Tools" "Modern UI" "Media Suite" "AI Tools" "Nerd Font")
     local states=(1 1 0 0 1) # Defaults
     local times_min=(2 1 5 2 1) # Estimated mins (min)
-    local times_max=(3 2 15 5 2) # Estimated mins (max)
+    local times_max=(3 2 20 5 2) # Estimated mins (max)
 
     while true; do
         clear
@@ -270,10 +270,10 @@ install_media_suite() {
     log_warn "This step involves compiling heavy dependencies (e.g., rapidfuzz)."
     log_warn "It may take 5-15 minutes on a phone. Please be patient."
     
-    # Use timeout if available to prevent infinite hangs (10 mins)
+    # Use timeout if available to prevent infinite hangs (20 mins)
     local PIP_CMD="pip"
     if command -v timeout &> /dev/null; then
-        PIP_CMD="timeout 600 pip"
+        PIP_CMD="timeout 1200 pip"
     fi
 
     if $PIP_CMD install --prefer-binary spotdl; then
@@ -283,7 +283,7 @@ install_media_suite() {
     else
         local EXIT_CODE=$?
         if [ $EXIT_CODE -eq 124 ]; then
-             log_error "spotdl installation timed out (limit: 10 mins)."
+             log_error "spotdl installation timed out (limit: 20 mins)."
              log_warn "Your device might be too slow to compile 'rapidfuzz'."
         else
              log_error "spotdl installation failed."
@@ -594,7 +594,6 @@ if [ "$DO_UI" -eq 1 ]; then
     install_modern_tools
     install_micro_editor
 fi
-if [ "$DO_MEDIA" -eq 1 ]; then install_media_suite; fi
 if [ "$DO_AI" -eq 1 ]; then install_gemini; install_termux_whisper; fi
 if [ "$DO_FONT" -eq 1 ]; then install_nerd_font; fi
 
@@ -603,6 +602,9 @@ if [ "$DO_BASE" -eq 1 ] || [ "$DO_UI" -eq 1 ]; then
     configure_fish
     set_default_shell
 fi
+
+# Install Media Suite LAST (Longest duration)
+if [ "$DO_MEDIA" -eq 1 ]; then install_media_suite; fi
 
 cleanup_motd
 finalize_setup "$HAS_ERROR"
