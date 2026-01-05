@@ -205,11 +205,17 @@ uninstall_packages() {
         log_success "Visual tools uninstalled."
     fi
 
+    # Fish Shell
+    if prompt_confirm "Uninstall Fish Shell?"; then
+        pkg uninstall fish -y
+        log_success "Fish Shell uninstalled."
+    fi
+
     # Core Dependencies (High Risk)
-    echo -e "${RED}WARNING:${NC} Uninstalling Core Dependencies (git, fish, python, nodejs, ffmpeg, rust, build-essential) might break other things."
+    echo -e "${RED}WARNING:${NC} Uninstalling Core Dependencies (git, python, nodejs, ffmpeg, rust, build-essential) might break other things."
     echo "Only do this if you are sure you didn't have them before bootstrapping."
     if prompt_confirm "Uninstall Core Dependencies?" "N"; then
-        pkg uninstall fish git python nodejs-lts ffmpeg termux-api rust binutils build-essential -y
+        pkg uninstall git python nodejs-lts ffmpeg termux-api rust binutils build-essential -y
         log_success "Core dependencies uninstalled."
     fi
 }

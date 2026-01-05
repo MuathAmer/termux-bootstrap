@@ -4,11 +4,14 @@ A modular, safe, and mobile-optimized bootstrap script for your Termux environme
 
 ## Features
 
-### 🚀 Core Tools
-- **Fish Shell**: Friendly interactive shell with auto-completions.
+### 🚀 Core Utilities
 - **Git**: Distributed version control.
 - **Node.js**: JavaScript runtime (LTS).
-- **Gemini CLI**: Google's AI assistant directly in your terminal (Termux Optimized).
+- **Python**: Popular programming language.
+
+### 🐠 Fish Shell (Optional)
+- **Interactive Shell**: Friendly shell with auto-completions and syntax highlighting.
+- **Aliases**: Pre-configured shortcuts for mobile efficiency (only available if Fish is installed).
 
 ### 📦 Community Extras (New!)
 - **Media Suite**: Installs `yt-dlp` (YouTube) and `spotDL` (Spotify) with **FFmpeg**.

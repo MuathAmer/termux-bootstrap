@@ -91,11 +91,11 @@ finalize_setup() {
 
 show_menu() {
     # Default States (1=ON, 0=OFF)
-    # 0:Base, 1:UI, 2:Media, 3:AI, 4:Font
-    local options=("Base Tools" "Modern UI" "Media Suite" "AI Tools" "Nerd Font")
-    local states=(1 1 0 0 1) # Defaults
-    local times_min=(2 1 5 2 1) # Estimated mins (min)
-    local times_max=(3 2 20 5 2) # Estimated mins (max)
+    # 0:Core, 1:Fish, 2:UI, 3:Media, 4:AI, 5:Font
+    local options=("Core Utils" "Fish Shell" "Modern UI" "Media Suite" "AI Tools" "Nerd Font")
+    local states=(1 1 1 0 0 1) # Defaults
+    local times_min=(2 1 1 5 2 1) # Estimated mins (min)
+    local times_max=(3 1 2 20 5 2) # Estimated mins (max)
 
     while true; do
         clear
@@ -128,7 +128,7 @@ show_menu() {
         fi
 
         # Toggle logic
-        if [[ "$selection" =~ ^[1-5]$ ]]; then
+        if [[ "$selection" =~ ^[1-6]$ ]]; then
             local idx=$((selection-1))
             if [ "${states[$idx]}" -eq 1 ]; then
                 states[$idx]=0
@@ -139,11 +139,12 @@ show_menu() {
     done
 
     # Export choices
-    DO_BASE=${states[0]}
-    DO_UI=${states[1]}
-    DO_MEDIA=${states[2]}
-    DO_AI=${states[3]}
-    DO_FONT=${states[4]}
+    DO_CORE=${states[0]}
+    DO_FISH=${states[1]}
+    DO_UI=${states[2]}
+    DO_MEDIA=${states[3]}
+    DO_AI=${states[4]}
+    DO_FONT=${states[5]}
 }
 
 backup_file() {
@@ -189,12 +190,19 @@ update_system() {
     pkg update -y && pkg upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 }
 
-install_base_tools() {
-    log_header "Base Tools Installation"
+install_core_utils() {
+    log_header "Core Utilities"
     log_info "Installing core packages..."
     # Added build-essential and python for node-gyp native compilations
-    pkg install git fish nodejs-lts curl termux-api build-essential python -y
-    log_success "Base tools installed."
+    pkg install git nodejs-lts curl termux-api build-essential python -y
+    log_success "Core tools installed."
+}
+
+install_fish() {
+    log_header "Fish Shell Setup"
+    log_info "Installing Fish Shell..."
+    pkg install fish -y
+    log_success "Fish Shell installed."
 }
 
 install_modern_tools() {
@@ -571,8 +579,8 @@ trap cleanup EXIT INT TERM
 
 # Check arguments
 if [ "$1" == "-y" ]; then
-    # Silent Mode defaults: Base + UI + Font (No heavy media/AI)
-    DO_BASE=1; DO_UI=1; DO_MEDIA=0; DO_AI=0; DO_FONT=1
+    # Silent Mode defaults: Core + Fish + UI + Font
+    DO_CORE=1; DO_FISH=1; DO_UI=1; DO_MEDIA=0; DO_AI=0; DO_FONT=1
     INTERACTIVE=false
 else
     # Interactive Menu
@@ -589,7 +597,9 @@ setup_storage
 # Always update system first
 update_system
 
-if [ "$DO_BASE" -eq 1 ]; then install_base_tools; fi
+if [ "$DO_CORE" -eq 1 ]; then install_core_utils; fi
+if [ "$DO_FISH" -eq 1 ]; then install_fish; fi
+
 if [ "$DO_UI" -eq 1 ]; then 
     install_modern_tools
     install_micro_editor
@@ -598,7 +608,7 @@ if [ "$DO_AI" -eq 1 ]; then install_gemini; install_termux_whisper; fi
 if [ "$DO_FONT" -eq 1 ]; then install_nerd_font; fi
 
 # Common Configs
-if [ "$DO_BASE" -eq 1 ] || [ "$DO_UI" -eq 1 ]; then
+if [ "$DO_FISH" -eq 1 ]; then
     configure_fish
     set_default_shell
 fi
@@ -616,11 +626,14 @@ else
     log_warn "Setup Complete (With Errors). Check output above."
 fi
 echo -e "  ${YELLOW}*${NC} Please ${GREEN}restart Termux${NC} to apply all changes."
+
 if [ "$DO_MEDIA" -eq 1 ]; then
     echo -e "  ${YELLOW}*${NC} Media Aliases: ${BLUE}music${NC}, ${BLUE}video${NC}."
 fi
 if [ "$DO_AI" -eq 1 ]; then
     echo -e "  ${YELLOW}*${NC} AI Alias: ${BLUE}whisper${NC}."
 fi
-echo -e "  ${YELLOW}*${NC} Type ${BLUE}shortcuts${NC} for a help guide."
+if [ "$DO_FISH" -eq 1 ]; then
+    echo -e "  ${YELLOW}*${NC} Type ${BLUE}shortcuts${NC} for a help guide."
+fi
 echo "--------------------------------------------"

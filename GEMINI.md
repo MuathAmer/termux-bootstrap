@@ -4,9 +4,9 @@
 **Role:** Automated Bootstrap/Setup Manager for Android Termux.
 
 ## 🟢 Current Status
-*   **Version:** v2.3
+*   **Version:** v2.4
 *   **Phase:** UX Revolution
-*   **Focus:** "Set & Forget" Installer (Interactive Menu, Wake Lock, Notifications), Robustness, and Safety.
+*   **Focus:** Modular Architecture (Unbundled Fish), "Set & Forget" Installer, Robustness, and Safety.
 
 ## 📚 Architecture
 1.  **`setup.sh`:** The core installer. Handles logic, package installation, config injection, and updates.
