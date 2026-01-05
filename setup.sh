@@ -328,8 +328,8 @@ if command -q yt-dlp
     alias video='yt-dlp'
 end
 if command -q spotdl
-    # Force output to Music folder
-    alias music='spotdl --output /sdcard/Music/SpotDL'
+    # Advanced Music Downloader (Lyrics, LRC, Metadata Update)
+    alias music='spotdl download --output /sdcard/Music/SpotDL --lyrics synced genius musixmatch azlyrics --generate-lrc --overwrite metadata --scan-for-songs --force-update-metadata'
 end
 
 # Termux Whisper Alias

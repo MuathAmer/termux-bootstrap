@@ -87,7 +87,7 @@ To make mobile usage easier, the following shortcuts are included:
 | Alias | Command | Description |
 | :--- | :--- | :--- |
 | **`video`** | `yt-dlp ...` | Download video to `/sdcard/Download/Termux` |
-| **`music`** | `spotdl ...` | Download Spotify songs to `/sdcard/Music` |
+| **`music`** | `spotdl ...` | Smart download (Lyrics, LRC, Metadata) |
 | **`whisper`** | `termux-whisper` | Launch the AI Transcriber |
 | **`upgrade-all`** | *(Function)* | Update System, Pip, NPM, & Repos |
 | `copy` | `termux-clipboard-set` | Pipe text to Android clipboard |
