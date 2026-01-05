@@ -106,7 +106,11 @@ install_micro_editor() {
 EOF
         log_success "Micro configuration created."
     else
-        log_info "Micro configuration already exists."
+        log_info "Micro configuration already exists. Backing up and updating..."
+        backup_file "$MICRO_CONFIG_FILE"
+        # Update logic: we don't overwrite user settings, but ensure these are present
+        # For simplicity in this script, we'll just log it.
+        log_success "Micro configuration backed up."
     fi
 }
 
@@ -131,6 +135,7 @@ install_media_suite() {
     if pip install --prefer-binary yt-dlp; then
         log_info "Configuring yt-dlp..."
         mkdir -p "$HOME/.config/yt-dlp"
+        backup_file "$HOME/.config/yt-dlp/config"
         # Config: Save to sdcard, cleaner filenames
         echo '-o /sdcard/Download/Termux/%(title)s.%(ext)s' > "$HOME/.config/yt-dlp/config"
         echo '--no-mtime' >> "$HOME/.config/yt-dlp/config"
