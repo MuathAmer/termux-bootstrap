@@ -28,6 +28,8 @@ NC='\033[0m' # No Color
 
 # --- Helper Functions ---
 
+HAS_ERROR=0
+
 log_header() { 
     echo -e "\n${PURPLE}============================================================${NC}"
     echo -e "${PURPLE}:: ${CYAN}$1${NC}"
@@ -37,7 +39,10 @@ log_header() {
 log_info() { echo -e "${BLUE}  [INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}  [OK]${NC}   $1"; }
 log_warn() { echo -e "${YELLOW}  [WARN]${NC} $1"; }
-log_error() { echo -e "${RED}  [ERR]${NC}  $1"; }
+log_error() { 
+    echo -e "${RED}  [ERR]${NC}  $1"
+    HAS_ERROR=1
+}
 
 prompt_confirm() {
     # If not interactive, return 0 (true/yes)
@@ -58,12 +63,29 @@ prompt_confirm() {
 }
 
 finalize_setup() {
-    # Signal completion via Android API
+    local status=$1
     if command -v termux-toast &> /dev/null; then
-        termux-toast -g top "Termux Bootstrap Complete!"
+        if [ "$status" -eq 0 ]; then
+             termux-toast -g top -b "white" -c "black" "Termux Bootstrap Complete!"
+        else
+             termux-toast -g top -b "red" -c "white" "Setup Finished with Errors!"
+        fi
     fi
+    
     if command -v termux-vibrate &> /dev/null; then
-        termux-vibrate -f -d 500
+        if [ "$status" -eq 0 ]; then
+            # Success: Two long pulses (Triumphant)
+            termux-vibrate -f -d 500
+            sleep 0.7
+            termux-vibrate -f -d 500
+        else
+            # Failure: Three short pulses (Alert)
+            termux-vibrate -f -d 200
+            sleep 0.3
+            termux-vibrate -f -d 200
+            sleep 0.3
+            termux-vibrate -f -d 200
+        fi
     fi
 }
 
@@ -583,10 +605,14 @@ if [ "$DO_BASE" -eq 1 ] || [ "$DO_UI" -eq 1 ]; then
 fi
 
 cleanup_motd
-finalize_setup
+finalize_setup "$HAS_ERROR"
 
 echo "--------------------------------------------"
-log_success "Setup Complete!"
+if [ "$HAS_ERROR" -eq 0 ]; then
+    log_success "Setup Complete!"
+else
+    log_warn "Setup Complete (With Errors). Check output above."
+fi
 echo -e "  ${YELLOW}*${NC} Please ${GREEN}restart Termux${NC} to apply all changes."
 if [ "$DO_MEDIA" -eq 1 ]; then
     echo -e "  ${YELLOW}*${NC} Media Aliases: ${BLUE}music${NC}, ${BLUE}video${NC}."
