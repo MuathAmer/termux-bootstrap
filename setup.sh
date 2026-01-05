@@ -110,15 +110,23 @@ show_menu() {
 
         for i in "${!options[@]}"; do
             local mark=" "
+            local extra=""
             if [ "${states[$i]}" -eq 1 ]; then
                 mark="x"
                 total_min=$((total_min + times_min[i]))
                 total_max=$((total_max + times_max[i]))
             fi
-            echo -e " [${mark}] $((i+1)). ${options[$i]}"
+            
+            # Suggest Fish
+            if [ "$i" -eq 1 ]; then extra="${YELLOW}(Recommended for shortcuts)${NC}"; fi
+            
+            echo -e " [${mark}] $((i+1)). ${options[$i]} $extra"
         done
 
         echo -e "\n ${CYAN}Estimated Time: ${YELLOW}${total_min}-${total_max} minutes${NC}"
+        if [ "${states[1]}" -eq 0 ]; then
+             echo -e " ${RED}Warning: Shortcuts/Aliases will NOT be installed without Fish.${NC}"
+        fi
         echo -e "--------------------------------------------"
         echo -e " Enter number to toggle (e.g. '3'), or ENTER to start."
         read -r -p " > " selection
