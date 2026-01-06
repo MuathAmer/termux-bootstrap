@@ -45,6 +45,8 @@ Now powered by the **`tb`** command-line manager.
 
 ## Installation
 
+![Install QR Code](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=curl%20-sL%20https%3A%2F%2Fraw.githubusercontent.com%2FMuathAmer%2Ftermux-bootstrap%2Fmain%2Fsetup.sh%20%7C%20bash)
+
 ### Option 1: One-Liner (Recommended)
 
 Requires `curl`.

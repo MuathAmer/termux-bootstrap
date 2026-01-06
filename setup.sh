@@ -454,7 +454,16 @@ configure_fish() {
     cat <<'EOF' >> "$CONFIG_FILE"
 # Core
 function fish_greeting
-    echo -e "\033[0;90m🚀 Termux Bootstrap active. Type '\033[0;36mtb\033[0;90m' for tools.\033[0m"
+    if test -f ~/.termux_bootstrap_first_run
+        echo -e "\n\033[1;35mWelcome to Termux Bootstrap (tb)! 🎉\033[0m"
+        echo -e "Here are 3 things to try:"
+        echo -e "  1. Type \033[0;36mtb\033[0m to see your new super-powers."
+        echo -e "  2. Type \033[0;36mask \"hello\"\033[0m to test the AI."
+        echo -e "  3. Type \033[0;36mopen .\033[0m to view files on Android.\n"
+        rm ~/.termux_bootstrap_first_run
+    else
+        echo -e "\033[0;90m🚀 Termux Bootstrap active. Type '\033[0;36mtb\033[0;90m' for tools.\033[0m"
+    end
 end
 
 # Modern Tools Aliases
@@ -645,6 +654,9 @@ fi
 
 # Install Media Suite LAST (Longest duration)
 if [ "$DO_MEDIA" -eq 1 ]; then install_media_suite; fi
+
+# Enable First Run Tour
+touch ~/.termux_bootstrap_first_run
 
 cleanup_motd
 finalize_setup "$HAS_ERROR"
