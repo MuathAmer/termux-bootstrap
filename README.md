@@ -4,6 +4,8 @@ A modular, safe, and mobile-optimized bootstrap script and CLI manager for your 
 
 Now powered by the **`tb`** command-line manager.
 
+[📜 View Changelog](CHANGELOG.md)
+
 ## Features
 
 ### 🚀 Core Utilities
