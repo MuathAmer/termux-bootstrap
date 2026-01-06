@@ -2,6 +2,14 @@
 
 All notable changes to the **Termux Bootstrap (tb)** project will be documented in this file.
 
+## [v2.7.1] - 2026-01-05
+### Changed
+- **CLI Split:** Separated `tb update` (Full System Update) and `tb sync` (Script Sync Only) for better control.
+
+## [v2.7.0] - 2026-01-05
+### Added
+- **`tb theme`:** Introduced an interactive theme switcher with popular color schemes (Dracula, Nord, Gruvbox, Matrix).
+
 ## [v2.6.0] - 2026-01-05
 ### Added
 - **First Run Tour:** A welcoming guide that appears on the first shell launch to help new users get started.

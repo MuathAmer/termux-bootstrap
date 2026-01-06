@@ -101,7 +101,8 @@ To make mobile usage easier, the following shortcuts are included. Type **`tb`**
 | Alias | Command | Description |
 | :--- | :--- | :--- |
 | **`tb`** | *(Wrapper)* | **Display help & manage environment** |
-| **`tb update`** | `...` | Update System + Bootstrap (Replaces `upgrade-all`) |
+| **`tb update`** | `...` | Full System Update (System + Scripts) |
+| **`tb sync`** | `...` | Sync Bootstrap scripts with GitHub only |
 | **`video`** | `yt-dlp ...` | Download video to `/sdcard/Download/Termux` |
 | **`music`** | `spotdl ...` | Smart download (Lyrics, LRC, Metadata) |
 | **`whisper`** | `termux-whisper` | Launch the AI Transcriber |

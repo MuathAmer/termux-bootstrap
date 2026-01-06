@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # ==============================================================================
-# Termux Bootstrap (tb) v2.6.0
+# Termux Bootstrap (tb) v2.7.1
 # A modular, safe, and mobile-optimized setup script for Termux.
 # ==============================================================================
 

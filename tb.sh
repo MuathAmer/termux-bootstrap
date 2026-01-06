@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # ==============================================================================
-# Termux Bootstrap CLI (tb) v2.6.0
+# Termux Bootstrap CLI (tb) v2.7.1
 # The Swiss Army Knife for your Termux Environment.
 # ==============================================================================
 
@@ -174,8 +174,18 @@ EOF
     termux-reload-settings
 }
 
+cmd_sync() {
+    if [ -d "$HOME/termux-bootstrap/.git" ]; then
+        echo -e "${BLUE}[-] Syncing Termux Bootstrap with GitHub...${NC}"
+        (cd "$HOME/termux-bootstrap" && git pull)
+        echo -e "${GREEN}[OK] Scripts synced.${NC}"
+    else
+        echo -e "${RED}[ERR] Bootstrap repo not found at $HOME/termux-bootstrap.${NC}"
+    fi
+}
+
 cmd_update() {
-    echo -e "${BLUE}[-] Updating System Packages...${NC}"
+    echo -e "${BLUE}[-] Updating System Packages (pkg)...${NC}"
     pkg update -y && pkg upgrade -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\"
 
     if command -v npm &> /dev/null; then
@@ -193,12 +203,45 @@ cmd_update() {
         (cd "$HOME/termux-whisper" && git pull)
     fi
 
-    if [ -d "$HOME/termux-bootstrap/.git" ]; then
-        echo -e "${BLUE}[-] Updating Termux Bootstrap...${NC}"
-        (cd "$HOME/termux-bootstrap" && git pull)
-    fi
+    # Sync Bootstrap scripts as well
+    cmd_sync
 
-    echo -e "${GREEN}[OK] Upgrade Complete!${NC}"
+    echo -e "${GREEN}[OK] Full System Update Complete!${NC}"
+}
+
+cmd_help() {
+    echo -e "\n${PURPLE}============================================${NC}"
+    echo -e "${PURPLE}       TERMUX BOOTSTRAP SHORTCUTS           ${NC}"
+    echo -e "${PURPLE}============================================${NC}"
+    
+    echo -e "${GREEN}[Media]${NC}"
+    echo -e "  ${CYAN}video${NC}   : Download video to /sdcard/Download"
+    echo -e "  ${CYAN}music${NC}   : Smart Spotify download (+Lyrics/LRC)"
+    
+    echo -e "\n${GREEN}[AI]${NC}"
+    echo -e "  ${CYAN}whisper${NC} : AI Speech-to-Text (Offline)"
+    echo -e "  ${CYAN}ask${NC}     : Ask AI (Supports piping: echo '...' | ask 'Summary')"
+    
+    echo -e "\n${GREEN}[Git]${NC}"
+    echo -e "  ${CYAN}g${NC}       : git shortcut"
+    echo -e "  ${CYAN}gl${NC}      : Pretty, narrow git log for mobile"
+    
+    echo -e "\n${GREEN}[System]${NC}"
+    echo -e "  ${CYAN}up${NC}      : pkg update && upgrade"
+    echo -e "  ${CYAN}in${NC}      : pkg install"
+    echo -e "  ${CYAN}open${NC}    : Open file in Android app"
+    echo -e "  ${CYAN}serve${NC}   : Start web server in current dir"
+    echo -e "  ${CYAN}copy${NC}    : Pipe to Android clipboard"
+    echo -e "  ${CYAN}paste${NC}   : Paste from Android clipboard"
+    echo -e "  ${CYAN}c${NC}       : Clear screen"
+    
+    echo -e "\n${GREEN}[CLI Manager]${NC}"
+    echo -e "  ${CYAN}tb sync${NC}   : Sync Bootstrap scripts only"
+    echo -e "  ${CYAN}tb update${NC} : Full System Update (Pkg, Pip, Npm, etc)"
+    echo -e "  ${CYAN}tb theme${NC}  : Change terminal color scheme"
+    echo -e "  ${CYAN}tb help${NC}   : Show this guide"
+    
+    echo -e "\n${YELLOW}Tip: Type 'tb <command>' to manage your environment.${NC}\n"
 }
 
 # --- Main Dispatch ---
@@ -206,6 +249,9 @@ cmd_update() {
 case "$1" in
     update)
         cmd_update
+        ;;
+    sync)
+        cmd_sync
         ;;
     theme)
         cmd_theme
