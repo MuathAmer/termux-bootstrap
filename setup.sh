@@ -52,7 +52,7 @@ prompt_confirm() {
     
     echo ""
     while true; do
-        read -r -p "$(echo -e "${CYAN}? $1 [Y/n]: ${NC}")" yn
+        read -r -p "$(echo -e "${CYAN}? $1 [Y/n]: ${NC}")" yn < /dev/tty
         case $yn in
             [Yy]* ) return 0;;
             [Nn]* ) return 1;;
@@ -129,7 +129,7 @@ show_menu() {
         fi
         echo -e "--------------------------------------------"
         echo -e " Enter number to toggle (e.g. '3'), or ENTER to start."
-        read -r -p " > " selection
+        read -r -p " > " selection < /dev/tty
 
         if [ -z "$selection" ]; then
             break

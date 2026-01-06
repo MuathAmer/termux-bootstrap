@@ -50,7 +50,7 @@ prompt_confirm() {
 
     echo ""
     while true; do
-        read -r -p "$(echo -e "${CYAN}? $1 $prompt_suffix: ${NC}")" yn
+        read -r -p "$(echo -e "${CYAN}? $1 $prompt_suffix: ${NC}")" yn < /dev/tty
         case $yn in
             [Yy]* ) return 0;;
             [Nn]* ) return 1;;
@@ -102,7 +102,7 @@ restore_interactive() {
     echo "   [s] Skip (Keep current)"
     
     while true; do
-        read -r -p "$(echo -e "${CYAN}? Action [0-$((count-1))/d/s]: ${NC}")" choice
+        read -r -p "$(echo -e "${CYAN}? Action [0-$((count-1))/d/s]: ${NC}")" choice < /dev/tty
         case $choice in
             [0-9]*)
                 if [ "$choice" -ge 0 ] && [ "$choice" -lt "$count" ]; then
