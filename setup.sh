@@ -202,7 +202,7 @@ ensure_persistence() {
             # Remove partial dir if exists
             if [ -d "$INSTALL_DIR" ]; then rm -rf "$INSTALL_DIR"; fi
             
-            git clone https://github.com/MuathAmer/termux-bootstrap.git "$INSTALL_DIR"
+            git clone https://github.com/itsmuaaz/termux-bootstrap.git "$INSTALL_DIR"
             log_success "Repository cloned to $INSTALL_DIR"
         fi
     fi
@@ -332,7 +332,7 @@ install_termux_whisper() {
         log_warn "Termux Whisper directory already exists. Skipping clone."
     else
         log_info "Cloning Termux Whisper..."
-        git clone https://github.com/MuathAmer/termux-whisper.git "$HOME/termux-whisper"
+        git clone https://github.com/itsmuaaz/termux-whisper.git "$HOME/termux-whisper"
         
         log_info "Running Termux Whisper setup..."
         chmod +x "$HOME/termux-whisper/setup.sh"

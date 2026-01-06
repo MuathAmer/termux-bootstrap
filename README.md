@@ -25,7 +25,7 @@ Now powered by the **`tb`** command-line manager.
 - **Media Suite**: Installs `yt-dlp` (YouTube) and `spotDL` (Spotify) with **FFmpeg**.
     - *Optimized:* Automatically configures downloads to save to `/sdcard/Download/Termux` and `/sdcard/Music`.
     - *Note:* `spotDL` installation involves compiling heavy dependencies. It may take 5-15 minutes. A timeout protection is in place to prevent infinite hangs.
-- **Termux Whisper**: Installs [termux-whisper](https://github.com/MuathAmer/termux-whisper) for offline, privacy-focused AI speech transcription on your phone.
+- **Termux Whisper**: Installs [termux-whisper](https://github.com/itsmuaaz/termux-whisper) for offline, privacy-focused AI speech transcription on your phone.
 
 ### 📱 Mobile Optimizations (Portrait Mode)
 - **Starship (Portrait Config)**: Optional 2-line prompt optimized for narrow phone screens.
@@ -51,7 +51,7 @@ Now powered by the **`tb`** command-line manager.
 
 ## Installation
 
-![Install QR Code](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=curl%20-sL%20https%3A%2F%2Fraw.githubusercontent.com%2FMuathAmer%2Ftermux-bootstrap%2Fmain%2Fsetup.sh%20%7C%20bash)
+![Install QR Code](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=curl%20-sL%20https%3A%2F%2Fraw.githubusercontent.com%2Fitsmuaaz%2Ftermux-bootstrap%2Fmain%2Fsetup.sh%20%7C%20bash)
 
 ### Option 1: One-Liner (Recommended)
 
@@ -59,14 +59,14 @@ Requires `curl`.
 
 ```bash
 pkg install curl -y
-curl -sL https://raw.githubusercontent.com/MuathAmer/termux-bootstrap/main/setup.sh | bash
+curl -sL https://raw.githubusercontent.com/itsmuaaz/termux-bootstrap/main/setup.sh | bash
 ```
 
 ### Option 2: Clone and Run
 
 ```bash
 pkg install git -y
-git clone https://github.com/MuathAmer/termux-bootstrap.git
+git clone https://github.com/itsmuaaz/termux-bootstrap.git
 cd termux-bootstrap
 chmod +x setup.sh
 ./setup.sh
