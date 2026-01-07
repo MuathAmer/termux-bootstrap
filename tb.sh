@@ -217,6 +217,70 @@ cmd_update() {
     cmd_sync
 
     echo -e "${GREEN}[OK] Full System Update Complete!${NC}"
+cmd_web() {
+    # 1. Dependency Check
+    local deps=("ttyd" "tmux" "btop")
+    local missing=()
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" &> /dev/null; then
+            missing+=("$dep")
+        fi
+    done
+
+    if [ ${#missing[@]} -gt 0 ]; then
+        echo -e "${BLUE}[-] Installing dependencies (${missing[*]})...${NC}"
+        pkg install -y "${missing[@]}"
+    fi
+
+    # 2. Wake Lock
+    if command -v termux-wake-lock &> /dev/null; then
+        termux-wake-lock
+    fi
+
+    # 3. IP Detection
+    local IP=$(ifconfig | grep -A 1 'wlan0' | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)
+    if [ -z "$IP" ]; then
+        # Fallback: try to find any 192.168 address
+        IP=$(ifconfig | grep 'inet 192.168' | head -n 1 | awk '{print $2}' | cut -d/ -f1)
+    fi
+    if [ -z "$IP" ]; then IP="localhost"; fi
+
+    # 4. Auth
+    echo -e "${PURPLE}Set a password for web access [Enter for random]:${NC}"
+    read -r -s PASSWORD
+    if [ -z "$PASSWORD" ]; then
+        PASSWORD=$((1000 + RANDOM % 8999))
+        echo -e "Using random password: ${YELLOW}$PASSWORD${NC}"
+    fi
+
+    # 5. Tmux Setup
+    # Kill existing session if any to start fresh
+    tmux kill-session -t tb_web 2>/dev/null
+    
+    # Create session, detached
+    tmux new-session -d -s tb_web
+    # Split window: Top (Shell), Bottom (System Monitor)
+    # Actually, Side-by-side is better for wide screens (laptops)
+    tmux split-window -h
+    # Run btop in the right pane
+    tmux send-keys -t tb_web:0.1 'btop' C-m
+    # Focus on the left pane (Shell)
+    tmux select-pane -t tb_web:0.0
+
+    # 6. Start ttyd
+    local PORT=8080
+    echo -e "\n${GREEN}🚀 Web Terminal Active!${NC}"
+    echo -e "🔗 URL:  ${CYAN}http://$IP:$PORT${NC}"
+    echo -e "🔐 Creds: user: ${YELLOW}tb${NC} / pass: ${YELLOW}$PASSWORD${NC}"
+    echo -e "${BLUE}(Press Ctrl+C to stop)${NC}"
+
+    # Trap to cleanup
+    trap "tmux kill-session -t tb_web; termux-wake-unlock; echo -e '\nStopped.'; exit" INT TERM
+
+    # Run ttyd (blocking)
+    # -W: Writeable
+    # -c: Creds user:pass
+    ttyd -p $PORT -c "tb:$PASSWORD" tmux attach -t tb_web
 }
 
 cmd_help() {
@@ -246,6 +310,7 @@ cmd_help() {
     echo -e "  ${CYAN}c${NC}       : Clear screen"
     
     echo -e "\n${GREEN}[CLI Manager]${NC}"
+    echo -e "  ${CYAN}tb web${NC}    : Start Web Terminal (Dashboard)"
     echo -e "  ${CYAN}tb sync${NC}   : Sync Bootstrap scripts only"
     echo -e "  ${CYAN}tb update${NC} : Full System Update (Pkg, Pip, Npm, etc)"
     echo -e "  ${CYAN}tb theme${NC}  : Change terminal color scheme"
@@ -262,6 +327,9 @@ case "$1" in
         ;;
     sync)
         cmd_sync
+        ;;
+    web)
+        cmd_web
         ;;
     theme)
         cmd_theme

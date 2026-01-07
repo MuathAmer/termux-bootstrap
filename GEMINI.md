@@ -4,9 +4,9 @@
 **Role:** Automated Bootstrap/Setup Manager for Android Termux.
 
 ## 🟢 Current Status
-*   **Version:** v2.8.1
-*   **Phase:** Polish & Shine
-*   **Focus:** Config Persistence (Auto-Refresh on Sync), Fish Completions, Themes.
+*   **Version:** v2.9.0
+*   **Phase:** Connectivity
+*   **Focus:** Web Dashboard (tb web), TUI Bridge, Config Persistence.
 
 ## 📚 Architecture
 1.  **`setup.sh`:** The core installer. Handles logic, package installation, config injection, and updates.

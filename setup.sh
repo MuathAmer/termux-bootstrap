@@ -595,10 +595,11 @@ install_completions() {
     
     cat <<EOF > "$COMP_DIR/tb.fish"
 # Completions for tb (Termux Bootstrap)
-complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme help" -a "update" -d "Full System Update"
-complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme help" -a "sync" -d "Sync Scripts Only"
-complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme help" -a "theme" -d "Change Theme"
-complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme help" -a "help" -d "Show Help"
+complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme web help" -a "update" -d "Full System Update"
+complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme web help" -a "sync" -d "Sync Scripts Only"
+complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme web help" -a "theme" -d "Change Theme"
+complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme web help" -a "web" -d "Start Web Dashboard"
+complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme web help" -a "help" -d "Show Help"
 EOF
     log_success "Fish completions installed."
 }
