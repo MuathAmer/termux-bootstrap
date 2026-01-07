@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # ==============================================================================
-# Termux Bootstrap Uninstaller v2.6.0
+# Termux Bootstrap Uninstaller v2.8.1
 # Safely reverts changes made by the setup.sh script.
 # ==============================================================================
 
@@ -240,7 +240,7 @@ echo " | |  | | '_ \| | '_ \/ __| __/ _\` | | |"
 echo " | |__| | | | | | | | \__ \ || (_| | | |"
 echo "  \____/|_| |_|_|_| |_|___/\__\__,_|_|_|"
 echo "                                        "
-echo "          (tb)  U N I N S T A L L E R   v2.6.0"
+echo "          (tb)  U N I N S T A L L E R   v2.8.1"
 echo -e "${NC}"
 echo "This script will help you revert changes made by Termux Bootstrap."
 

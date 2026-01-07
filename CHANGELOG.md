@@ -2,6 +2,14 @@
 
 All notable changes to the **Termux Bootstrap (tb)** project will be documented in this file.
 
+## [v2.8.1] - 2026-01-05
+### Fixed
+- **Sync Persistence:** `tb sync` now automatically re-runs setup logic (refresh mode) to ensure new configurations (aliases, completions) are applied immediately after an update.
+
+## [v2.8.0] - 2026-01-05
+### Added
+- **Fish Completions:** Added Tab autocomplete support for the `tb` command (update, sync, theme, help).
+
 ## [v2.7.1] - 2026-01-05
 ### Changed
 - **CLI Split:** Separated `tb update` (Full System Update) and `tb sync` (Script Sync Only) for better control.
