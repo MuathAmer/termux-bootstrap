@@ -246,11 +246,10 @@ cmd_web() {
     elif command -v htop &> /dev/null; then
         monitor_cmd="htop"
     else
-        # Try to install btop, fallback to htop
-        echo -e "${BLUE}[-] Installing system monitor...${NC}"
-        if pkg install -y btop; then
+        # Try to install btop, fallback to htop. Silence errors.
+        if pkg install -y btop &> /dev/null; then
             monitor_cmd="btop"
-        elif pkg install -y htop; then
+        elif pkg install -y htop &> /dev/null; then
             monitor_cmd="htop"
         fi
     fi
