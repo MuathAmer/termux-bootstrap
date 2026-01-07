@@ -220,14 +220,8 @@ cmd_update() {
 }
 
 cmd_web() {
-    local MODE=$1
-
     # 1. Critical Dependency Check
     local critical_deps=("ttyd")
-    if [ "$MODE" != "--simple" ]; then
-        critical_deps+=("tmux")
-    fi
-    
     local missing_critical=()
     for dep in "${critical_deps[@]}"; do
         if ! command -v "$dep" &> /dev/null; then
@@ -245,29 +239,12 @@ cmd_web() {
         fi
     fi
 
-    # 2. Monitor Tool (Optional, only for Dashboard mode)
-    local monitor_cmd="top"
-    if [ "$MODE" != "--simple" ]; then
-        if command -v btop &> /dev/null; then
-            monitor_cmd="btop"
-        elif command -v htop &> /dev/null; then
-            monitor_cmd="htop"
-        else
-            # Try to install btop, fallback to htop. Silence errors.
-            if pkg install -y btop &> /dev/null; then
-                monitor_cmd="btop"
-            elif pkg install -y htop &> /dev/null; then
-                monitor_cmd="htop"
-            fi
-        fi
-    fi
-
-    # 3. Wake Lock
+    # 2. Wake Lock
     if command -v termux-wake-lock &> /dev/null; then
         termux-wake-lock
     fi
 
-    # 4. IP Detection
+    # 3. IP Detection
     local IP=$(ifconfig 2>/dev/null | grep -A 1 'wlan0' | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)
     if [ -z "$IP" ]; then
         # Fallback: try to find any 192.168 address
@@ -275,7 +252,7 @@ cmd_web() {
     fi
     if [ -z "$IP" ]; then IP="localhost"; fi
 
-    # 5. Auth
+    # 4. Auth
     echo -e "${PURPLE}Set a password for web access [Enter for random]:${NC}"
     read -r -s PASSWORD
     if [ -z "$PASSWORD" ]; then
@@ -289,36 +266,12 @@ cmd_web() {
     echo -e "🔐 Creds: user: ${YELLOW}tb${NC} / pass: ${YELLOW}$PASSWORD${NC}"
     echo -e "${BLUE}(Press Ctrl+C to stop)${NC}"
 
-    if [ "$MODE" == "--simple" ]; then
-        # Simple Mode: Direct Shell
-        echo -e "${YELLOW}[i] Simple mode (No tmux/dashboard).${NC}"
-        trap "termux-wake-unlock; echo -e '\nStopped.'; exit" INT TERM
-        ttyd -p $PORT -c "tb:$PASSWORD" fish
-    else
-        # Dashboard Mode: Tmux
-        # Kill existing session if any to start fresh
-        tmux kill-session -t tb_web 2>/dev/null
-        
-        # Create session, detached
-        tmux new-session -d -s tb_web
-        
-        # Enable mouse support (Crucial for web touch/click focus)
-        tmux set-option -t tb_web -g mouse on
-        
-        # Split window: Top (Shell), Bottom (System Monitor)
-        tmux split-window -h
-        # Run monitor in the right pane
-        tmux send-keys -t tb_web:0.1 "$monitor_cmd" C-m
-        # Focus on the left pane (Shell)
-        tmux select-pane -t tb_web:0.0
+    # Trap to cleanup
+    trap "termux-wake-unlock; echo -e '\nStopped.'; exit" INT TERM
 
-        # Trap to cleanup
-        trap "tmux kill-session -t tb_web; termux-wake-unlock; echo -e '\nStopped.'; exit" INT TERM
-
-        # Run ttyd (blocking)
-        # Force xterm env
-        ttyd -p $PORT -c "tb:$PASSWORD" env TERM=xterm-256color tmux attach-session -t tb_web
-    fi
+    # Run ttyd (blocking)
+    # Expose fish shell directly
+    ttyd -p $PORT -c "tb:$PASSWORD" fish
 }
 
 cmd_help() {
@@ -348,7 +301,7 @@ cmd_help() {
     echo -e "  ${CYAN}c${NC}       : Clear screen"
     
     echo -e "\n${GREEN}[CLI Manager]${NC}"
-    echo -e "  ${CYAN}tb web${NC}    : Start Web Terminal (Use --simple for no-tmux)"
+    echo -e "  ${CYAN}tb web${NC}    : Start Web Terminal (Direct Shell)"
     echo -e "  ${CYAN}tb sync${NC}   : Sync Bootstrap scripts only"
     echo -e "  ${CYAN}tb update${NC} : Full System Update (Pkg, Pip, Npm, etc)"
     echo -e "  ${CYAN}tb theme${NC}  : Change terminal color scheme"
