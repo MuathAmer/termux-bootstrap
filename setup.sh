@@ -633,6 +633,12 @@ if [ "$1" == "-y" ]; then
     # Silent Mode defaults: Core + Fish + UI + Font
     DO_CORE=1; DO_FISH=1; DO_UI=1; DO_MEDIA=0; DO_AI=0; DO_FONT=1
     INTERACTIVE=false
+elif [ "$1" == "--refresh" ]; then
+    # Refresh Mode: Update configs only (Post-Sync)
+    log_info "Refreshing configurations..."
+    DO_CORE=0; DO_FISH=1; DO_UI=1; DO_MEDIA=0; DO_AI=0; DO_FONT=1
+    INTERACTIVE=false
+    REFRESH_MODE=true
 else
     # Interactive Menu
     check_for_updates
@@ -645,8 +651,10 @@ log_info "Wake lock acquired. Device will stay awake during setup."
 # Start Execution
 setup_storage
 
-# Always update system first
-update_system
+# Always update system first (unless refreshing)
+if [ "$REFRESH_MODE" != "true" ]; then
+    update_system
+fi
 
 if [ "$DO_CORE" -eq 1 ]; then install_core_utils; fi
 if [ "$DO_FISH" -eq 1 ]; then install_fish; fi

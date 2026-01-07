@@ -177,8 +177,18 @@ EOF
 cmd_sync() {
     if [ -d "$HOME/termux-bootstrap/.git" ]; then
         echo -e "${BLUE}[-] Syncing Termux Bootstrap with GitHub...${NC}"
-        (cd "$HOME/termux-bootstrap" && git pull)
-        echo -e "${GREEN}[OK] Scripts synced.${NC}"
+        (
+            cd "$HOME/termux-bootstrap" || return
+            if git pull; then
+                echo -e "${GREEN}[OK] Scripts synced.${NC}"
+                
+                # Apply new configurations (Refresh Mode)
+                if [ -x "./setup.sh" ]; then
+                    echo -e "${BLUE}[*] Applying configuration updates...${NC}"
+                    ./setup.sh --refresh
+                fi
+            fi
+        )
     else
         echo -e "${RED}[ERR] Bootstrap repo not found at $HOME/termux-bootstrap.${NC}"
     fi
