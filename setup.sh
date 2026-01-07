@@ -588,6 +588,21 @@ EOF
     log_success "Fish configuration updated."
 }
 
+install_completions() {
+    log_info "Installing Fish completions..."
+    local COMP_DIR="$HOME/.config/fish/completions"
+    mkdir -p "$COMP_DIR"
+    
+    cat <<EOF > "$COMP_DIR/tb.fish"
+# Completions for tb (Termux Bootstrap)
+complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme help" -a "update" -d "Full System Update"
+complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme help" -a "sync" -d "Sync Scripts Only"
+complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme help" -a "theme" -d "Change Theme"
+complete -c tb -f -n "not __fish_seen_subcommand_from update sync theme help" -a "help" -d "Show Help"
+EOF
+    log_success "Fish completions installed."
+}
+
 set_default_shell() {
     local SHELL_PATH=$(command -v fish)
     if [ "$SHELL" != "$SHELL_PATH" ]; then
@@ -649,6 +664,7 @@ if [ "$DO_FONT" -eq 1 ]; then install_nerd_font; fi
 # Common Configs
 if [ "$DO_FISH" -eq 1 ]; then
     configure_fish
+    install_completions
     set_default_shell
 fi
 

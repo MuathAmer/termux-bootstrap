@@ -144,6 +144,11 @@ clean_configs() {
     restore_interactive "$STARSHIP_CONFIG_FILE" "Starship Config"
     restore_interactive "$MICRO_CONFIG_FILE" "Micro Editor Config"
     restore_interactive "$YTDLP_CONFIG_FILE" "yt-dlp Config"
+    
+    if [ -f "$HOME/.config/fish/completions/tb.fish" ]; then
+        rm "$HOME/.config/fish/completions/tb.fish"
+        log_success "Fish completions removed."
+    fi
 }
 
 uninstall_extras() {
