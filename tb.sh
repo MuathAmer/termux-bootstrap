@@ -220,8 +220,24 @@ cmd_update() {
 }
 
 cmd_web() {
+    local PORT=8080
+    local MODE="simple"
+
+    # Argument Parsing
+    for arg in "$@"; do
+        if [ "$arg" == "--persist" ]; then
+            MODE="persistent"
+        elif [[ "$arg" =~ ^[0-9]+$ ]]; then
+            PORT=$arg
+        fi
+    done
+
     # 1. Critical Dependency Check
     local critical_deps=("ttyd")
+    if [ "$MODE" == "persistent" ]; then
+        critical_deps+=("tmux")
+    fi
+    
     local missing_critical=()
     for dep in "${critical_deps[@]}"; do
         if ! command -v "$dep" &> /dev/null; then
@@ -260,21 +276,32 @@ cmd_web() {
         echo -e "Using random password: ${YELLOW}$PASSWORD${NC}"
     fi
 
-    local PORT=8080
     echo -e "\n${GREEN}🚀 Web Terminal Active!${NC}"
     echo -e "🔗 URL:  ${CYAN}http://$IP:$PORT${NC}"
     echo -e "🔐 Creds: user: ${YELLOW}tb${NC} / pass: ${YELLOW}$PASSWORD${NC}"
     echo -e "${BLUE}(Press Ctrl+C to stop)${NC}"
 
-    # Trap to cleanup
+    # Common trap
     trap "termux-wake-unlock; echo -e '\nStopped.'; exit" INT TERM
 
-    # Run ttyd (blocking)
-    # Expose fish shell directly with explicit TERM to prevent DA1 query timeout
-    # Explicitly enable writable mode
-    # Use Canvas renderer + Blink for perceived responsiveness
-    # Request Nerd Fonts for icon support
-    ttyd --writable -p $PORT -c "tb:$PASSWORD" -t "rendererType=canvas,cursorBlink=true,disableStdin=false,fontFamily='JetBrainsMono Nerd Font','FiraCode Nerd Font','MesloLGS NF','monospace'" env TERM=xterm-256color TB_WEB_MODE=1 fish
+    # TTYD Options (Canvas + Blink + Font)
+    local TTYD_OPTS="-t rendererType=canvas,cursorBlink=true,disableStdin=false,fontFamily='JetBrainsMono Nerd Font','FiraCode Nerd Font','MesloLGS NF','monospace'"
+
+    if [ "$MODE" == "simple" ]; then
+        # Simple Mode: Direct Shell (Default)
+        ttyd --writable -p $PORT -c "tb:$PASSWORD" $TTYD_OPTS env TERM=xterm-256color TB_WEB_MODE=1 fish
+    else
+        # Persistent Mode: Tmux
+        local SESSION="tb_web_$PORT"
+        echo -e "${YELLOW}[i] Persistent Session: $SESSION${NC}"
+        
+        # Ensure global mouse support
+        tmux set -g mouse on 2>/dev/null
+
+        # Run ttyd wrapping tmux
+        # new-session -A: Attach if exists, else create
+        ttyd --writable -p $PORT -c "tb:$PASSWORD" $TTYD_OPTS tmux new-session -A -s "$SESSION" "env TERM=xterm-256color TB_WEB_MODE=1 fish"
+    fi
 }
 
 cmd_help() {
@@ -304,7 +331,7 @@ cmd_help() {
     echo -e "  ${CYAN}c${NC}       : Clear screen"
     
     echo -e "\n${GREEN}[CLI Manager]${NC}"
-    echo -e "  ${CYAN}tb web${NC}    : Start Web Terminal (Direct Shell)"
+    echo -e "  ${CYAN}tb web${NC}    : Start Web Terminal (Use --persist for tmux)"
     echo -e "  ${CYAN}tb sync${NC}   : Sync Bootstrap scripts only"
     echo -e "  ${CYAN}tb update${NC} : Full System Update (Pkg, Pip, Npm, etc)"
     echo -e "  ${CYAN}tb theme${NC}  : Change terminal color scheme"
