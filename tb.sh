@@ -314,6 +314,14 @@ cmd_web() {
             "$TMUX_BIN" set -g mouse on 2>/dev/null
         fi
 
+        # Configure Status Bar (Cheatsheet)
+        # We configure this session specifically to show helpers
+        "$TMUX_BIN" set-option -t "$SESSION" status-position bottom 2>/dev/null
+        "$TMUX_BIN" set-option -t "$SESSION" status-style "bg=black,fg=white" 2>/dev/null
+        "$TMUX_BIN" set-option -t "$SESSION" status-left "#[fg=green,bold] TB Web #[default]" 2>/dev/null
+        "$TMUX_BIN" set-option -t "$SESSION" status-right "#[fg=cyan]New: ^B c #[fg=red]| #[fg=cyan]Close: ^B x #[fg=red]| #[fg=cyan]Switch: ^B n/p " 2>/dev/null
+        "$TMUX_BIN" set-option -t "$SESSION" status-right-length 80 2>/dev/null
+
         # Run ttyd wrapping tmux
         # Pass env vars explicitly to tmux session command string
         ttyd --writable -p $PORT -c "tb:$PASSWORD" -t "rendererType=canvas,cursorBlink=true,disableStdin=false,fontFamily='JetBrainsMono Nerd Font','FiraCode Nerd Font','MesloLGS NF','monospace'" "$TMUX_BIN" new-session -A -s "$SESSION" "env TERM=xterm-256color TB_WEB_MODE=1 $FISH_BIN"
