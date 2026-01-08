@@ -272,8 +272,8 @@ cmd_web() {
     # Run ttyd (blocking)
     # Expose fish shell directly with explicit TERM to prevent DA1 query timeout
     # Explicitly enable writable mode
-    # Use WebGL renderer for performance
-    ttyd --writable -p $PORT -c "tb:$PASSWORD" -t rendererType=webgl env TERM=xterm-256color fish
+    # Use Canvas renderer + Blink for perceived responsiveness
+    ttyd --writable -p $PORT -c "tb:$PASSWORD" -t "rendererType=canvas,cursorBlink=true,disableStdin=false" env TERM=xterm-256color fish
 }
 
 cmd_help() {
