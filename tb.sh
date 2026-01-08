@@ -270,8 +270,8 @@ cmd_web() {
     trap "termux-wake-unlock; echo -e '\nStopped.'; exit" INT TERM
 
     # Run ttyd (blocking)
-    # Expose fish shell directly
-    ttyd -p $PORT -c "tb:$PASSWORD" fish
+    # Expose fish shell directly with explicit TERM to prevent DA1 query timeout
+    ttyd -p $PORT -c "tb:$PASSWORD" env TERM=xterm-256color fish
 }
 
 cmd_help() {
