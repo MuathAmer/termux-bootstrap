@@ -366,7 +366,7 @@ case "$1" in
         cmd_sync
         ;;
     web)
-        cmd_web
+        cmd_web "$@"
         ;;
     theme)
         cmd_theme
