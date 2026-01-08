@@ -271,7 +271,8 @@ cmd_web() {
 
     # Run ttyd (blocking)
     # Expose fish shell directly with explicit TERM to prevent DA1 query timeout
-    ttyd -p $PORT -c "tb:$PASSWORD" env TERM=xterm-256color fish
+    # Explicitly enable writable mode
+    ttyd --writable -p $PORT -c "tb:$PASSWORD" env TERM=xterm-256color fish
 }
 
 cmd_help() {
