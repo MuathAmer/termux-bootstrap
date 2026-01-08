@@ -274,7 +274,7 @@ cmd_web() {
     # Explicitly enable writable mode
     # Use Canvas renderer + Blink for perceived responsiveness
     # Request Nerd Fonts for icon support
-    ttyd --writable -p $PORT -c "tb:$PASSWORD" -t "rendererType=canvas,cursorBlink=true,disableStdin=false,fontFamily='JetBrainsMono Nerd Font','FiraCode Nerd Font','MesloLGS NF','monospace'" env TERM=xterm-256color fish
+    ttyd --writable -p $PORT -c "tb:$PASSWORD" -t "rendererType=canvas,cursorBlink=true,disableStdin=false,fontFamily='JetBrainsMono Nerd Font','FiraCode Nerd Font','MesloLGS NF','monospace'" env TERM=xterm-256color TB_WEB_MODE=1 fish
 }
 
 cmd_help() {

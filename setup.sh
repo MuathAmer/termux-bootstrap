@@ -454,6 +454,12 @@ configure_fish() {
     cat <<'EOF' >> "$CONFIG_FILE"
 # Core
 function fish_greeting
+    if test -n "$TB_WEB_MODE"
+        echo -e "\n\033[1;33m💻 Web Session Detected.\033[0m"
+        echo -e "Missing icons? Install \033[4mJetBrains Mono Nerd Font\033[0m on this device:"
+        echo -e "\033[0;36mhttps://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip\033[0m\n"
+    end
+
     if test -f ~/.termux_bootstrap_first_run
         echo -e "\n\033[1;35mWelcome to Termux Bootstrap (tb)! 🎉\033[0m"
         echo -e "Here are 3 things to try:"
