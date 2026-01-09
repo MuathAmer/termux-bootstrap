@@ -352,6 +352,8 @@ cmd_web() {
                 "$TMUX_BIN" set-option -t "$SESSION_NAME" status-position bottom 2>/dev/null
                 "$TMUX_BIN" set-option -t "$SESSION_NAME" status-style "bg=black,fg=white" 2>/dev/null
                 "$TMUX_BIN" set-option -t "$SESSION_NAME" status-left "#[fg=magenta,bold] TB Dashboard #[default]" 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" status-right "#[fg=cyan]New: ^B c #[fg=red]| #[fg=cyan]Close: ^B x #[fg=red]| #[fg=cyan]Switch: ^B n/p " 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" status-right-length 80 2>/dev/null
                 
                 # Split Layout
                 # Split vertically (Main / Bottom) - Bottom is 30%
