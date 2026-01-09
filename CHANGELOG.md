@@ -2,6 +2,10 @@
 
 All notable changes to the **Termux Bootstrap (tb)** project will be documented in this file.
 
+## [v2.9.6] - 2026-01-05
+### Fixed
+- **Status Bar Persistence:** Web sessions now re-apply the cheat sheet status bar configuration on every attach, fixing missing UI elements in existing sessions.
+
 ## [v2.9.5] - 2026-01-05
 ### Changed
 - **CLI Refinement:** Renamed `tb web --persist` to `tb web --session` for better semantic clarity.
