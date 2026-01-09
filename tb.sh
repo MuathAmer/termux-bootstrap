@@ -224,9 +224,14 @@ cmd_web() {
     local MODE="simple"
 
     # Argument Parsing
+    # Priority: Dashboard > Session > Simple
     for arg in "$@"; do
-        if [ "$arg" == "--session" ]; then
+        if [ "$arg" == "--dashboard" ]; then
+            MODE="dashboard"
+        elif [ "$arg" == "--session" ] && [ "$MODE" != "dashboard" ]; then
             MODE="session"
+        elif [ "$arg" == "--simple" ] && [ "$MODE" != "dashboard" ] && [ "$MODE" != "session" ]; then
+            MODE="simple"
         elif [[ "$arg" =~ ^[0-9]+$ ]]; then
             PORT=$arg
         fi
@@ -234,8 +239,11 @@ cmd_web() {
 
     # 1. Critical Dependency Check
     local critical_deps=("ttyd")
-    if [ "$MODE" == "session" ]; then
+    if [ "$MODE" != "simple" ]; then
         critical_deps+=("tmux")
+    fi
+    if [ "$MODE" == "dashboard" ]; then
+        critical_deps+=("btop" "yazi")
     fi
     
     local missing_critical=()
@@ -278,7 +286,7 @@ cmd_web() {
     # 5. Execution
     local FISH_BIN=$(command -v fish)
     local TMUX_BIN=$(command -v tmux)
-    local BASH_BIN=$(command -v bash) # Wrapper for environment injection
+    local BASH_BIN=$(command -v bash)
 
     echo -e "\n${GREEN}🚀 Web Terminal Active!${NC}"
     echo -e "🔗 URL:  ${CYAN}http://$IP:$PORT${NC}"
@@ -288,34 +296,67 @@ cmd_web() {
     # Trap to cleanup
     trap "termux-wake-unlock; echo -e '\nStopped.'; exit" INT TERM
 
-    # Export variables so child processes (ttyd -> fish) inherit them in Simple Mode
+    # Export variables
     export TERM=xterm-256color
     export TB_WEB_MODE=1
 
-    # TTYD Options (Canvas + Blink + Font)
+    # TTYD Options
     local TTYD_OPTS="-t rendererType=canvas,cursorBlink=true,disableStdin=false"
 
     if [ "$MODE" == "simple" ]; then
-        # Simple Mode: Direct Shell (Default)
+        # Simple Mode: Direct Shell
         ttyd --writable -p $PORT -c "tb:$PASSWORD" $TTYD_OPTS "$FISH_BIN"
     else
-        # Persistent Mode: Tmux
-        local SESSION="tb_web_$PORT"
-        echo -e "${YELLOW}[i] Web Session: $SESSION (Persistent)${NC}"
+        # Persistent Modes
+        local SESSION_NAME=""
         
-        # Configure Status Bar (Cheatsheet)
-        if [ -n "$TMUX_BIN" ]; then
-            "$TMUX_BIN" set -g mouse on 2>/dev/null
-            "$TMUX_BIN" set-option -t "$SESSION" status-position bottom 2>/dev/null
-            "$TMUX_BIN" set-option -t "$SESSION" status-style "bg=black,fg=white" 2>/dev/null
-            "$TMUX_BIN" set-option -t "$SESSION" status-left "#[fg=green,bold] TB Web #[default]" 2>/dev/null
-            "$TMUX_BIN" set-option -t "$SESSION" status-right "#[fg=cyan]New: ^B c #[fg=red]| #[fg=cyan]Close: ^B x #[fg=red]| #[fg=cyan]Switch: ^B n/p " 2>/dev/null
-            "$TMUX_BIN" set-option -t "$SESSION" status-right-length 80 2>/dev/null
+        if [ "$MODE" == "dashboard" ]; then
+            SESSION_NAME="tb_dashboard_$PORT"
+            echo -e "${YELLOW}[i] Dashboard Session: $SESSION_NAME${NC}"
+            
+            # Create Dashboard if not exists
+            if ! "$TMUX_BIN" has-session -t "$SESSION_NAME" 2>/dev/null; then
+                # Create session (detached)
+                # Note: We must spawn the shell here correctly to inherit env vars
+                # Using the bash wrapper approach for the initial shell spawn
+                "$TMUX_BIN" new-session -d -s "$SESSION_NAME" "$BASH_BIN -c 'export TERM=xterm-256color TB_WEB_MODE=1; exec $FISH_BIN'"
+                
+                # Configure Settings
+                "$TMUX_BIN" set -g mouse on 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" status-position bottom 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" status-style "bg=black,fg=white" 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" status-left "#[fg=magenta,bold] TB Dashboard #[default]" 2>/dev/null
+                
+                # Split Layout
+                # Split vertically (Main / Bottom) - Bottom is 30%
+                "$TMUX_BIN" split-window -t "$SESSION_NAME" -v -p 30
+                # Split bottom pane horizontally (Monitor / FileManager)
+                "$TMUX_BIN" split-window -t "${SESSION_NAME}:0.1" -h
+                
+                # Send Commands to Panes
+                # Pane 1 (Bottom Left): btop
+                "$TMUX_BIN" send-keys -t "${SESSION_NAME}:0.1" 'btop' C-m
+                # Pane 2 (Bottom Right): yazi
+                "$TMUX_BIN" send-keys -t "${SESSION_NAME}:0.2" 'yazi' C-m
+                
+                # Focus Main Shell
+                "$TMUX_BIN" select-pane -t "${SESSION_NAME}:0.0"
+            fi
+        else
+            # Standard Session
+            SESSION_NAME="tb_session_$PORT"
+            echo -e "${YELLOW}[i] Session: $SESSION_NAME${NC}"
+            
+            # Configure basic session if new
+            if ! "$TMUX_BIN" has-session -t "$SESSION_NAME" 2>/dev/null; then
+                "$TMUX_BIN" new-session -d -s "$SESSION_NAME" "$BASH_BIN -c 'export TERM=xterm-256color TB_WEB_MODE=1; exec $FISH_BIN'"
+                "$TMUX_BIN" set -g mouse on 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" status-left "#[fg=green,bold] TB Session #[default]" 2>/dev/null
+            fi
         fi
 
-        # Run ttyd wrapping tmux
-        ttyd --writable -p $PORT -c "tb:$PASSWORD" $TTYD_OPTS \
-            "$TMUX_BIN" new-session -A -s "$SESSION" "$BASH_BIN -c 'export TERM=xterm-256color TB_WEB_MODE=1; exec $FISH_BIN'"
+        # Run ttyd attaching to the specific session
+        ttyd --writable -p $PORT -c "tb:$PASSWORD" $TTYD_OPTS "$TMUX_BIN" attach-session -t "$SESSION_NAME"
     fi
 }
 
@@ -346,7 +387,7 @@ cmd_help() {
     echo -e "  ${CYAN}c${NC}       : Clear screen"
     
     echo -e "\n${GREEN}[CLI Manager]${NC}"
-    echo -e "  ${CYAN}tb web${NC}    : Start Web Terminal (Use --session for tmux)"
+    echo -e "  ${CYAN}tb web${NC}    : Web Terminal (--dashboard, --session)"
     echo -e "  ${CYAN}tb sync${NC}   : Sync Bootstrap scripts only"
     echo -e "  ${CYAN}tb update${NC} : Full System Update (Pkg, Pip, Npm, etc)"
     echo -e "  ${CYAN}tb theme${NC}  : Change terminal color scheme"
