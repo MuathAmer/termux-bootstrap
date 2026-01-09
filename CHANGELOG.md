@@ -2,6 +2,17 @@
 
 All notable changes to the **Termux Bootstrap (tb)** project will be documented in this file.
 
+## [v2.9.8] - 2026-01-05
+### Fixed
+- **Sixel Initialization:** Moved `tmux` configuration (passthrough enablement) to execute immediately after session creation. This fixes a race condition where `yazi` would launch before graphics support was active, resulting in broken image previews.
+
+## [v2.9.7] - 2026-01-05
+### Added
+- **Yazi Integration:** Dashboard mode now automatically configures `yazi` with Tmux integration:
+    - `<C-d>`: Syncs the adjacent shell pane to the selected directory.
+    - `o`: Opens the selected file in `micro` in the adjacent pane.
+- **Sixel Graphics:** Enabled `allow-passthrough` in Tmux sessions to support image previews (Sixel) in `yazi` via the web terminal.
+
 ## [v2.9.6] - 2026-01-05
 ### Fixed
 - **Status Bar Persistence:** Web sessions now re-apply the cheat sheet status bar configuration on every attach, fixing missing UI elements in existing sessions.

@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # ==============================================================================
-# Termux Bootstrap CLI (tb) v2.9.6
+# Termux Bootstrap CLI (tb) v2.9.8
 # The Swiss Army Knife for your Termux Environment.
 # ==============================================================================
 
@@ -340,10 +340,41 @@ cmd_web() {
             SESSION_NAME="tb_dashboard_$PORT"
             echo -e "${YELLOW}[i] Dashboard Session: $SESSION_NAME${NC}"
             
+            # Configure Yazi Keybindings for Tmux Integration
+            if [[ "$FILE_CMD" == "yazi" ]]; then
+                local YAZI_CONF_DIR="$HOME/.config/yazi"
+                local YAZI_KEYMAP="$YAZI_CONF_DIR/keymap.toml"
+                mkdir -p "$YAZI_CONF_DIR"
+                
+                # Check/Create Keymap
+                if [ ! -f "$YAZI_KEYMAP" ] || ! grep -q "tmux send-keys" "$YAZI_KEYMAP"; then
+                     echo -e "${BLUE}[i] Configuring Yazi for Tmux integration...${NC}"
+                     # If file exists, ensure newline before appending
+                     [ -f "$YAZI_KEYMAP" ] && echo "" >> "$YAZI_KEYMAP"
+                     
+                     cat <<EOF >> "$YAZI_KEYMAP"
+# --- Termux Bootstrap Integration ---
+[[manager.prepend_keymap]]
+on   = [ "<C-d>" ]
+run  = 'shell --block --confirm "tmux send-keys -t .+ cd \"\$1\" Enter"'
+desc = "Sync adjacent pane to dir"
+
+[[manager.prepend_keymap]]
+on   = [ "o" ]
+run  = 'shell --block --confirm "tmux send-keys -t .+ micro \"\$1\" Enter"'
+desc = "Open in adjacent pane"
+EOF
+                fi
+            fi
+            
             # Create Dashboard if not exists
             if ! "$TMUX_BIN" has-session -t "$SESSION_NAME" 2>/dev/null; then
                 # Create session (detached)
                 "$TMUX_BIN" new-session -d -s "$SESSION_NAME" "$BASH_BIN -c 'export TERM=xterm-256color TB_WEB_MODE=1; exec $FISH_BIN'"
+                
+                # Configure Settings (Early)
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" allow-passthrough on 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" update-environment "TERM TERM_PROGRAM" 2>/dev/null
                 
                 # Split Layout
                 # Split vertically (Main / Bottom) - Bottom is 30%
@@ -361,6 +392,8 @@ cmd_web() {
 
             # Configure Settings (Always Apply)
             "$TMUX_BIN" set -g mouse on 2>/dev/null
+            "$TMUX_BIN" set-option -t "$SESSION_NAME" allow-passthrough on 2>/dev/null
+            "$TMUX_BIN" set-option -t "$SESSION_NAME" update-environment "TERM TERM_PROGRAM" 2>/dev/null
             "$TMUX_BIN" set-option -t "$SESSION_NAME" status-position bottom 2>/dev/null
             "$TMUX_BIN" set-option -t "$SESSION_NAME" status-style "bg=black,fg=white" 2>/dev/null
             "$TMUX_BIN" set-option -t "$SESSION_NAME" status-left "#[fg=magenta,bold] TB Dashboard #[default]" 2>/dev/null
@@ -375,10 +408,16 @@ cmd_web() {
             # Create session if not exists
             if ! "$TMUX_BIN" has-session -t "$SESSION_NAME" 2>/dev/null; then
                 "$TMUX_BIN" new-session -d -s "$SESSION_NAME" "$BASH_BIN -c 'export TERM=xterm-256color TB_WEB_MODE=1; exec $FISH_BIN'"
+                
+                # Configure Settings (Early)
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" allow-passthrough on 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" update-environment "TERM TERM_PROGRAM" 2>/dev/null
             fi
 
             # Configure Settings (Always Apply)
             "$TMUX_BIN" set -g mouse on 2>/dev/null
+            "$TMUX_BIN" set-option -t "$SESSION_NAME" allow-passthrough on 2>/dev/null
+            "$TMUX_BIN" set-option -t "$SESSION_NAME" update-environment "TERM TERM_PROGRAM" 2>/dev/null
             "$TMUX_BIN" set-option -t "$SESSION_NAME" status-style "bg=black,fg=white" 2>/dev/null
             "$TMUX_BIN" set-option -t "$SESSION_NAME" status-left "#[fg=green,bold] TB Session #[default]" 2>/dev/null
             "$TMUX_BIN" set-option -t "$SESSION_NAME" status-right "#[fg=cyan]New: ^B c #[fg=red]| #[fg=cyan]Close: ^B x #[fg=red]| #[fg=cyan]Switch: ^B n/p " 2>/dev/null
