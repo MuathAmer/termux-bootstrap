@@ -379,7 +379,10 @@ cmd_web() {
             if ! "$TMUX_BIN" has-session -t "$SESSION_NAME" 2>/dev/null; then
                 "$TMUX_BIN" new-session -d -s "$SESSION_NAME" "$BASH_BIN -c 'export TERM=xterm-256color TB_WEB_MODE=1; exec $FISH_BIN'"
                 "$TMUX_BIN" set -g mouse on 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" status-style "bg=black,fg=white" 2>/dev/null
                 "$TMUX_BIN" set-option -t "$SESSION_NAME" status-left "#[fg=green,bold] TB Session #[default]" 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" status-right "#[fg=cyan]New: ^B c #[fg=red]| #[fg=cyan]Close: ^B x #[fg=red]| #[fg=cyan]Switch: ^B n/p " 2>/dev/null
+                "$TMUX_BIN" set-option -t "$SESSION_NAME" status-right-length 80 2>/dev/null
             fi
         fi
 
